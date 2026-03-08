@@ -9,7 +9,24 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MegaPack VIP — Acceso</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js">
+function toggleMenu(){
+  const m = document.getElementById('mobileMenu');
+  const o = document.getElementById('menuOverlay');
+  const open = m.classList.toggle('open');
+  o.style.display = open ? 'block' : 'none';
+}
+function closeMenu(){
+  document.getElementById('mobileMenu').classList.remove('open');
+  document.getElementById('menuOverlay').style.display='none';
+}
+function irAMobile(sec, btn){
+  closeMenu();
+  document.querySelectorAll('#mobileMenu .nav-btn').forEach(b=>b.classList.remove('activo'));
+  if(btn) btn.classList.add('activo');
+  irA(sec, null);
+}
+</script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <style>
@@ -254,10 +271,54 @@ body{font-family:'DM Sans',sans-serif;background:#000;color:var(--blanco);overfl
 
 @media(max-width:768px){
   .topbar-nav{display:none;}
+  .hamburger{display:flex;}
   .bienvenido{padding:20px 16px;}
   .bv-accesos{grid-template-columns:1fr;}
   .timers-bar{gap:10px;}
   .btn-comprar-bar span{display:none;}
+}
+.hamburger{
+  display:none;
+  flex-direction:column;
+  gap:5px;
+  background:transparent;
+  border:none;
+  cursor:pointer;
+  padding:6px;
+  margin-left:8px;
+}
+.hamburger span{
+  display:block;
+  width:22px;
+  height:2px;
+  background:var(--acento);
+  border-radius:2px;
+  transition:all .3s;
+}
+.mobile-menu{
+  display:none;
+  position:fixed;
+  top:56px;
+  left:0;right:0;
+  background:#111;
+  border-bottom:2px solid var(--acento);
+  z-index:999;
+  flex-direction:column;
+  padding:8px 0;
+}
+.mobile-menu.open{display:flex;}
+.mobile-menu .nav-btn{
+  width:100%;
+  text-align:left;
+  padding:14px 24px;
+  font-size:.9rem;
+  border-radius:0;
+  border-bottom:1px solid rgba(255,255,255,0.05);
+}
+.mobile-menu .nav-btn:last-child{border-bottom:none;}
+.mobile-menu .nav-btn.activo{
+  background:rgba(255,77,0,0.15);
+  color:var(--acento);
 }
 
 @media(max-width:480px){
@@ -337,6 +398,18 @@ body{font-family:'DM Sans',sans-serif;background:#000;color:var(--blanco);overfl
       <button class="nav-btn" onclick="irA('mentoria',this)">📚 Mentoría</button>
       <button class="nav-btn" onclick="irA('optimizador',this)">⚡ Optimizador PRO</button>
     </div>
+    <button class="hamburger" id="hambBtn" onclick="toggleMenu()">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <!-- MOBILE MENU -->
+  <div class="mobile-menu" id="mobileMenu">
+    <button class="nav-btn activo" onclick="irAMobile('bienvenido',this)">🏠 Inicio</button>
+    <button class="nav-btn" onclick="irAMobile('archivos',this)">🗂 Archivos</button>
+    <button class="nav-btn" onclick="irAMobile('mentoria',this)">📚 Mentoría</button>
+    <button class="nav-btn" onclick="irAMobile('optimizador',this)">⚡ Optimizador PRO</button>
+  </div>
+  <div id="menuOverlay" onclick="closeMenu()" style="display:none;position:fixed;inset:0;z-index:998;background:rgba(0,0,0,0.4);"></div>
     <div class="topbar-right">
       <img id="uAvatar" class="user-avatar" src="" alt="" style="display:none">
       <span class="user-nombre" id="uNombre"></span>
@@ -389,7 +462,7 @@ body{font-family:'DM Sans',sans-serif;background:#000;color:var(--blanco);overfl
     <!-- ARCHIVOS MEGAPACK -->
     <div class="sec" id="sec-archivos">
       <iframe class="frame-full" id="frameArchivos"
-        src="https://drive.google.com/embeddedfolderview?id=12JXdEm0UTjk3poANaWfeuG-PTxl0xXcE#grid"
+        src="https://drive.google.com/embeddedfolderview?id=1tHLnvZr04FuFA1dMuKJZNU-AJmuAM6Vr#grid"
         title="MegaPack VIP"></iframe>
       <div class="bloqueado" id="blArchivos" style="display:none">
         <div class="bl-ico">⏰</div>
