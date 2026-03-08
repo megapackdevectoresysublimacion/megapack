@@ -9,7 +9,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MegaPack VIP — Acceso</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js">
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script>
 function toggleMenu(){
   const m = document.getElementById('mobileMenu');
   const o = document.getElementById('menuOverlay');
@@ -24,7 +25,6 @@ function irAMobile(sec, btn){
   closeMenu();
   document.querySelectorAll('#mobileMenu .nav-btn').forEach(b=>b.classList.remove('activo'));
   if(btn) btn.classList.add('activo');
-  // Sync desktop nav buttons too
   document.querySelectorAll('.topbar-nav .nav-btn').forEach(b=>b.classList.remove('activo'));
   document.querySelectorAll('.topbar-nav .nav-btn').forEach(b=>{
     if(b.getAttribute('onclick') && b.getAttribute('onclick').includes("'"+sec+"'")) b.classList.add('activo');
