@@ -977,6 +977,7 @@ select {
   <div class="fstat">Costo: <b><span class="a" id="fCosto">$0.00</span></b></div>
   <div class="fstat">DPI exportación: <b id="fDpi">300</b></div>
   <div class="footer-acts">
+    <span id="autoSaveLbl" style="font-size:10px;color:var(--sec);align-self:center;display:none;">💾 guardado</span>
     <button class="btn btn-ghost btn-sm" onclick="descargarPDF()">📄 Exportar PDF</button>
     <button class="btn btn-primary btn-sm" onclick="descargarPNG()">⬇ Exportar PNG</button>
   </div>
@@ -1015,12 +1016,12 @@ function init() {
     backgroundColor: bgHex,
     preserveObjectStacking: true,
     stopContextMenu: true,
-    enableRetinaScaling: false,   // we handle scaling manually
-    imageSmoothingEnabled: true,  // crisp images at screen zoom
+    enableRetinaScaling: true,    // HD canvas — retina quality in editor
+    imageSmoothingEnabled: true,
   });
 
-  // Global image rendering quality — makes raster images render at native sharpness
-  fabric.Image.prototype.objectCaching  = false;  // no cached bitmap, always render at display res
+  // Global image rendering quality
+  fabric.Image.prototype.objectCaching  = false;  // always render from original bitmap
   fabric.Image.prototype.imageSmoothing = true;
 
   // ── Rotation origin always at center ─────────
@@ -1132,21 +1133,35 @@ function init() {
   drawRulers();
 
   // Fit canvas to viewport on start
-  requestAnimationFrame(() => { zoomFit(); });
+  requestAnimationFrame(() => {
+    zoomFit();
+    // Intentar recuperar trabajo guardado localmente
+    setTimeout(_tryRestoreLocal, 400);
+  });
 }
 
 // ═══════════════════════════════════════════════
 // KEYBOARD
 // ═══════════════════════════════════════════════
 function kbHandler(e) {
+  // Undo/Redo always work (except when typing in inputs)
+  if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+    if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'SELECT') {
+      e.preventDefault(); undo(); return;
+    }
+  }
+  if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || e.key === 'Y')) {
+    if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'SELECT') {
+      e.preventDefault(); redo(); return;
+    }
+  }
+
   if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
 
   const objs = canvas.getActiveObjects();
   const obj  = canvas.getActiveObject();
 
   if (e.key === 'Delete' || e.key === 'Backspace') { eliminar(); return; }
-  if ((e.ctrlKey || e.metaKey) && e.key === 'z') { e.preventDefault(); undo(); return; }
-  if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || e.key === 'Y')) { e.preventDefault(); redo(); return; }
   if ((e.ctrlKey || e.metaKey) && e.key === 'd') { e.preventDefault(); duplicar(); return; }
   if ((e.ctrlKey || e.metaKey) && e.key === 'a') { e.preventDefault(); canvas.discardActiveObject(); canvas.setActiveObject(new fabric.ActiveSelection(canvas.getObjects(), { canvas })); canvas.renderAll(); return; }
   if (e.key === 'r' || e.key === 'R') { girar90(); return; }
@@ -1272,12 +1287,67 @@ function updateDimLabels() {
 // ═══════════════════════════════════════════════
 function saveHistory() {
   if (_histLock) return;
-  // Descartar futuros si estamos en medio del historial
   _history = _history.slice(0, _historyIdx + 1);
   _history.push(canvas.toJSON(['data']));
   if (_history.length > HIST_MAX) _history.shift();
   _historyIdx = _history.length - 1;
   updateHistoryBtns();
+  // Auto-save al localStorage para recuperar si se cierra la pestaña
+  _autoSaveLocal();
+}
+
+// ─── Auto-save local ────────────────────────────
+const LS_KEY = 'megastudio_autosave';
+let _autoSaveTimer = null;
+
+function _autoSaveLocal() {
+  clearTimeout(_autoSaveTimer);
+  _autoSaveTimer = setTimeout(() => {
+    try {
+      const state = {
+        canvas: canvas.toJSON(['data']),
+        rolloW, rolloH, bgHex, bgTransp,
+        ts: Date.now()
+      };
+      localStorage.setItem(LS_KEY, JSON.stringify(state));
+      // Mostrar indicador brevemente
+      const lbl = document.getElementById('autoSaveLbl');
+      if (lbl) {
+        lbl.style.display = 'inline';
+        clearTimeout(lbl._t);
+        lbl._t = setTimeout(() => { lbl.style.display = 'none'; }, 2000);
+      }
+    } catch(e) { /* cuota excedida — ignorar */ }
+  }, 1500);
+}
+
+function _tryRestoreLocal() {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (!raw) return;
+    const state = JSON.parse(raw);
+    const ago   = Math.round((Date.now() - state.ts) / 60000);
+    const msg   = `Hay un trabajo guardado (hace ${ago < 1 ? 'menos de un minuto' : ago + ' min'}). ¿Recuperarlo?`;
+    if (!confirm(msg)) { localStorage.removeItem(LS_KEY); return; }
+    // Restaurar dimensiones
+    if (state.rolloW) { rolloW = state.rolloW; document.getElementById('inAncho').value = rolloW; }
+    if (state.rolloH) { rolloH = state.rolloH; document.getElementById('inAlto').value  = rolloH; }
+    canvas.setWidth(rolloW * CM);
+    canvas.setHeight(rolloH * CM);
+    if (state.bgHex)   { bgHex = state.bgHex; }
+    if (state.bgTransp){ bgTransp = true; setCheckerBg(); }
+    else if (bgHex)    { canvas.setBackgroundColor(bgHex, () => {}); }
+    _histLock = true;
+    canvas.loadFromJSON(state.canvas, () => {
+      canvas.renderAll();
+      updateStats();
+      updateDimLabels();
+      _setZoom(_currentZoom);
+      drawRulers();
+      _histLock = false;
+      toast('✅ Trabajo recuperado');
+    });
+  } catch(e) { localStorage.removeItem(LS_KEY); }
 }
 
 function undo() {
@@ -2158,9 +2228,10 @@ function autoEmpaquetar() {
 function descargarPNG() {
   showLoad('Generando PNG en alta resolución...');
   setTimeout(() => {
-    const dpi     = parseInt(document.getElementById('selDpi').value) || 300;
-    const pxPerCm = dpi / 2.54;
-    const mult    = pxPerCm / CM;
+    const dpi        = parseInt(document.getElementById('selDpi').value) || 300;
+    const pxPerCm    = dpi / 2.54;
+    const mult       = pxPerCm / CM;
+    const elimSemi   = document.getElementById('chkSemi')?.checked ?? true;
 
     const exportOpts = {
       format: 'png',
@@ -2170,20 +2241,45 @@ function descargarPNG() {
       imageSmoothingQuality: 'high'
     };
 
-    // Always export transparent — clear background before export, restore after
     const savedBg = canvas.backgroundColor;
     canvas.backgroundColor = null;
     canvas.renderAll();
+
     setTimeout(() => {
-      const url = canvas.toDataURL(exportOpts);
-      const a   = document.createElement('a');
-      a.href    = url;
-      a.download = `megastudio_${rolloW}x${rolloH}cm_${dpi}dpi.png`;
-      a.click();
-      hideLoad();
-      toast(`PNG · ${dpi} DPI · ${Math.round(rolloW * pxPerCm)} × ${Math.round(rolloH * pxPerCm)} px`);
-      canvas.backgroundColor = savedBg;
-      canvas.renderAll();
+      let url = canvas.toDataURL(exportOpts);
+
+      const finalize = (finalUrl) => {
+        const a   = document.createElement('a');
+        a.href    = finalUrl;
+        a.download = `megastudio_${rolloW}x${rolloH}cm_${dpi}dpi.png`;
+        a.click();
+        hideLoad();
+        toast(`PNG · ${dpi} DPI · ${Math.round(rolloW * pxPerCm)} × ${Math.round(rolloH * pxPerCm)} px`);
+        canvas.backgroundColor = savedBg;
+        canvas.renderAll();
+      };
+
+      if (elimSemi) {
+        // Binarizar canal alfa: píxeles con alfa < 128 → 0, alfa >= 128 → 255
+        const img = new Image();
+        img.onload = () => {
+          const oc  = document.createElement('canvas');
+          oc.width  = img.width;
+          oc.height = img.height;
+          const ox  = oc.getContext('2d');
+          ox.drawImage(img, 0, 0);
+          const id = ox.getImageData(0, 0, oc.width, oc.height);
+          const d  = id.data;
+          for (let i = 3; i < d.length; i += 4) {
+            d[i] = d[i] >= 128 ? 255 : 0;
+          }
+          ox.putImageData(id, 0, 0);
+          finalize(oc.toDataURL('image/png'));
+        };
+        img.src = url;
+      } else {
+        finalize(url);
+      }
     }, 40);
   }, 50);
 }
@@ -2192,18 +2288,31 @@ function descargarPDF() {
   showLoad('Generando PDF...');
   setTimeout(() => {
     const { jsPDF } = window.jspdf;
-    const dpi     = parseInt(document.getElementById('selDpi').value) || 300;
-    const pxPerCm = dpi / 2.54;
-    const mult    = pxPerCm / CM;
-    const orient  = rolloW > rolloH ? 'landscape' : 'portrait';
-    const doc     = new jsPDF({ orientation: orient, unit: 'cm', format: [rolloW, rolloH], compress: true });
+    const dpi      = parseInt(document.getElementById('selDpi').value) || 300;
+    const pxPerCm  = dpi / 2.54;
+    const mult     = pxPerCm / CM;
+    const elimSemi = document.getElementById('chkSemi')?.checked ?? true;
+    const orient   = rolloW > rolloH ? 'landscape' : 'portrait';
+    const doc      = new jsPDF({ orientation: orient, unit: 'cm', format: [rolloW, rolloH], compress: false });
 
-    // Always export transparent PNG embedded in PDF
+    const objs = canvas.getObjects();
+    if (!objs.length) {
+      hideLoad(); toast('No hay diseños en el lienzo'); return;
+    }
+
+    // Render each object separately at full DPI, positioned on the PDF page
+    let pending = objs.length;
+
     const savedBg = canvas.backgroundColor;
     canvas.backgroundColor = null;
     canvas.renderAll();
 
-    setTimeout(() => {
+    objs.forEach((obj, idx) => {
+      // Temporarily hide all other objects
+      const others = objs.filter((_, i) => i !== idx);
+      others.forEach(o => { o._savedVisible = o.visible; o.visible = false; });
+      canvas.renderAll();
+
       const url = canvas.toDataURL({
         format: 'png',
         multiplier: mult,
@@ -2211,14 +2320,50 @@ function descargarPDF() {
         imageSmoothingEnabled: true,
         imageSmoothingQuality: 'high'
       });
-      doc.addImage(url, 'PNG', 0, 0, rolloW, rolloH, undefined, 'FAST');
-      doc.save(`megastudio_${rolloW}x${rolloH}cm_${dpi}dpi.pdf`);
-      hideLoad();
-      toast(`PDF · ${dpi} DPI · fondo transparente`);
-      canvas.backgroundColor = savedBg;
-      canvas.renderAll();
-    }, 60);
+
+      // Restore visibility
+      others.forEach(o => { o.visible = o._savedVisible; delete o._savedVisible; });
+
+      // Get bounding box in cm
+      const bb   = obj.getBoundingRect();
+      const xCm  = bb.left   / CM;
+      const yCm  = bb.top    / CM;
+      const wCm  = bb.width  / CM;
+      const hCm  = bb.height / CM;
+
+      if (elimSemi) {
+        // Binarize alpha
+        const img = new Image();
+        img.onload = () => {
+          const oc = document.createElement('canvas');
+          oc.width = img.width; oc.height = img.height;
+          const ox = oc.getContext('2d');
+          ox.drawImage(img, 0, 0);
+          const id = ox.getImageData(0, 0, oc.width, oc.height);
+          const d  = id.data;
+          for (let i = 3; i < d.length; i += 4) d[i] = d[i] >= 128 ? 255 : 0;
+          ox.putImageData(id, 0, 0);
+          doc.addImage(oc.toDataURL('image/png'), 'PNG', xCm, yCm, wCm, hCm, `obj_${idx}`, 'FAST');
+          pending--;
+          if (pending === 0) finalizePDF(doc, dpi, savedBg);
+        };
+        img.src = url;
+      } else {
+        doc.addImage(url, 'PNG', xCm, yCm, wCm, hCm, `obj_${idx}`, 'FAST');
+        pending--;
+        if (pending === 0) finalizePDF(doc, dpi, savedBg);
+      }
+    });
+    canvas.renderAll();
   }, 50);
+}
+
+function finalizePDF(doc, dpi, savedBg) {
+  doc.save(`megastudio_${rolloW}x${rolloH}cm_${dpi}dpi.pdf`);
+  hideLoad();
+  toast(`PDF · ${dpi} DPI · imágenes separadas`);
+  canvas.backgroundColor = savedBg;
+  canvas.renderAll();
 }
 
 // ═══════════════════════════════════════════════
