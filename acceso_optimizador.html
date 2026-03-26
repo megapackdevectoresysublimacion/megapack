@@ -66,7 +66,7 @@ body{font-family:'DM Sans',sans-serif;background:#000;color:var(--blanco);overfl
 
 @media(max-width:768px){
   .timers-bar{flex-wrap:wrap;gap:6px;padding:8px 12px;}
-  .btn-comprar-bar{margin-left:0;width:100%;justify-content:center;font-size:.78rem;padding:9px 14px;}
+  .btn-comprar-bar{display:none;margin-left:0;width:100%;justify-content:center;font-size:.78rem;padding:9px 14px;}
 }
 @media(max-width:480px){
   .timer-item{font-size:.7rem;}
@@ -322,7 +322,7 @@ body{font-family:'DM Sans',sans-serif;background:#000;color:var(--blanco);overfl
       <span class="timer-label">⚡ Optimizador:</span>
       <span class="timer-val" id="tOptimizador">-- HORAS</span>
     </div>
-    <a href="https://pay.hotmart.com/F100830701W?off=afwr3u85" target="_blank" class="btn-comprar-bar">🔓 <span>ACCESO COMPLETO $57 USD/AÑO</span></a>
+    <a href="https://pay.hotmart.com/F100830701W?off=afwr3u85" target="_blank" class="btn-comprar-bar">🔓 <span>ACCESO COMPLETO $47 USD/AÑO</span></a>
   </div>
 
   <!-- SEC BIENVENIDO -->
@@ -373,7 +373,7 @@ body{font-family:'DM Sans',sans-serif;background:#000;color:var(--blanco);overfl
       <div class="bl-ico">🔒</div>
       <div class="bl-titulo">Tu prueba ha terminado</div>
       <div class="bl-sub">Obtén acceso completo por 1 año a todos los archivos, mentoría y el Optimizador PRO</div>
-      <a href="https://pay.hotmart.com/F100830701W?off=afwr3u85" target="_blank" class="btn-comprar-grande">🔓 ACCESO COMPLETO $57 USD/AÑO</a>
+      <a href="https://pay.hotmart.com/F100830701W?off=afwr3u85" target="_blank" class="btn-comprar-grande">🔓 ACCESO COMPLETO $47 USD/AÑO</a>
       <a href="https://wa.me/573171968082" target="_blank" class="btn-wa">💬 Contactar por WhatsApp</a>
     </div>
   </div>
@@ -418,7 +418,7 @@ body{font-family:'DM Sans',sans-serif;background:#000;color:var(--blanco);overfl
       <div class="bl-ico">🔒</div>
       <div class="bl-titulo">Tu prueba ha terminado</div>
       <div class="bl-sub">Obtén acceso completo por 1 año a todos los archivos, mentoría y el Optimizador PRO</div>
-      <a href="https://pay.hotmart.com/F100830701W?off=afwr3u85" target="_blank" class="btn-comprar-grande">🔓 ACCESO COMPLETO $57 USD/AÑO</a>
+      <a href="https://pay.hotmart.com/F100830701W?off=afwr3u85" target="_blank" class="btn-comprar-grande">🔓 ACCESO COMPLETO $47 USD/AÑO</a>
       <a href="https://wa.me/573171968082" target="_blank" class="btn-wa">💬 Contactar por WhatsApp</a>
     </div>
   </div>
@@ -434,7 +434,7 @@ body{font-family:'DM Sans',sans-serif;background:#000;color:var(--blanco);overfl
       <div class="bl-ico">🔒</div>
       <div class="bl-titulo">Tu prueba ha terminado</div>
       <div class="bl-sub">Obtén acceso completo por 1 año</div>
-      <a href="https://pay.hotmart.com/F100830701W?off=afwr3u85" target="_blank" class="btn-comprar-grande">🔓 ACCESO COMPLETO $57 USD/AÑO</a>
+      <a href="https://pay.hotmart.com/F100830701W?off=afwr3u85" target="_blank" class="btn-comprar-grande">🔓 ACCESO COMPLETO $47 USD/AÑO</a>
       <a href="https://wa.me/573171968082" target="_blank" class="btn-wa">💬 Contactar por WhatsApp</a>
     </div>
   </div>
@@ -484,7 +484,7 @@ const HORAS_ARCHIVOS    = 0.5;
 const HORAS_OPTIMIZADOR = 72;
 const HOTMART_URL = 'https://pay.hotmart.com/F100830701W?off=afwr3u85';
 
-let vencA, vencO, ticker;
+let vencA, vencO, ticker, gCompro = false, gTipoPlan = "prueba";
 
 function mostrar(id){
   document.getElementById('loading').style.display = 'none';
@@ -522,8 +522,10 @@ auth.onAuthStateChanged(async user => {
       usos: 1
     });
     vencA = vA; vencO = vO;
+    gCompro = false; gTipoPlan = 'prueba';
   } else {
     const d = snap.data();
+    gCompro = !!d.compro; gTipoPlan = d.tipoPlan || 'prueba';
     if(d.tipoPlan === 'anual' && d.compro){
       const f = new Date(d.fechaCompra || ahora);
       vencA = new Date(f.getTime() + 365*24*3600000);
@@ -540,6 +542,7 @@ auth.onAuthStateChanged(async user => {
   document.getElementById('uNombre').textContent = (user.displayName||'Usuario').split(' ')[0];
 
   mostrar('portal');
+  actualizarBtnCompra();
   actualizarBloqueos();
   irA('bienvenido', null);
 
@@ -585,10 +588,19 @@ function tick(){
   }
 }
 
+function actualizarBtnCompra(){
+  const btn = document.querySelector('.btn-comprar-bar');
+  if(!btn) return;
+  const ahora = new Date();
+  const noCompro = !gCompro;
+  const membrVencida = gCompro && gTipoPlan === 'anual' && vencA && vencA <= ahora;
+  btn.style.display = (noCompro || membrVencida) ? 'flex' : 'none';
+}
 function actualizarBloqueos(){
   const ahora = new Date();
   const aVenc = vencA && vencA < ahora;
   const oVenc = vencO && vencO < ahora;
+  actualizarBtnCompra();
   document.getElementById('blArchivos').style.display  = aVenc ? 'flex' : 'none';
   document.getElementById('blMentoria').style.display  = aVenc ? 'flex' : 'none';
   document.getElementById('blOptimizador').style.display = oVenc ? 'flex' : 'none';
