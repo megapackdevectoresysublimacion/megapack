@@ -578,7 +578,7 @@ const HORAS_OPTIMIZADOR = 72;
 const CLOUD_FUNCTION_URL = 'https://us-central1-optimizador-pro-dtf.cloudfunctions.net/darAccesoDrive';
 const HOTMART_URL = 'https://pay.hotmart.com/F100830701W?off=afwr3u85';
 
-let vencA, vencO, ticker;
+let vencA, vencO, ticker, _sessionToken = null, _sessionCheck = null;
 
 function mostrar(id){
   document.getElementById('loading').style.display = 'none';
@@ -685,6 +685,10 @@ auth.onAuthStateChanged(async user => {
     }
   }
 
+  // ── Sesión única: generar token y guardarlo en Firestore ──
+  _sessionToken = Math.random().toString(36).slice(2) + Date.now().toString(36);
+  await ref.update({ sessionToken: _sessionToken }).catch(() => {});
+
   // ── Avatar y nombre ──
   const av = document.getElementById('uAvatar');
   if(user.photoURL){ av.src = user.photoURL; av.style.display = 'block'; }
@@ -726,6 +730,18 @@ auth.onAuthStateChanged(async user => {
     irA('bienvenido', null);
     ticker = setInterval(tick, 1000);
     tick();
+    // ── Verificar sesión cada 30s ──
+    _sessionCheck = setInterval(async () => {
+      try {
+        const snap2 = await ref.get();
+        if(snap2.exists && snap2.data().sessionToken !== _sessionToken){
+          clearInterval(ticker);
+          clearInterval(_sessionCheck);
+          auth.signOut();
+          alert('⚠️ Tu sesión fue iniciada en otro dispositivo. Serás desconectado.');
+        }
+      } catch(e){}
+    }, 30000);
     // ── Mostrar temporizador Drive si es primera vez ──
     if(window._primerAcceso === true) {
       iniciarTemporizadorDrive();
@@ -928,6 +944,7 @@ function mostrarBtnDrive() {
 
 window.cerrarSesion = function(){
   clearInterval(ticker);
+  clearInterval(_sessionCheck);
   auth.signOut().then(() => {
     window.location.reload();
   });
