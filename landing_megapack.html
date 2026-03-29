@@ -526,6 +526,20 @@ footer{ background:#0D0D0D; border-top:1px solid rgba(255,255,255,0.05); padding
             inset 0 0 30px rgba(217, 119, 87, 0.1);
         }
       }
+
+/* === HAMBURGER MENU MOBILE === */
+.hamburger-btn{display:none;flex-direction:column;justify-content:center;gap:5px;background:none;border:none;cursor:pointer;padding:6px;z-index:200;margin-left:auto;}
+.hamburger-btn span{display:block;width:24px;height:2px;background:#fff;border-radius:2px;transition:all .3s;}
+.hamburger-btn.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+.hamburger-btn.open span:nth-child(2){opacity:0;}
+.hamburger-btn.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+.nav-mobile{display:none;position:fixed;top:56px;left:0;right:0;background:#111;border-bottom:2px solid #FF4D00;z-index:199;flex-direction:column;padding:8px 0;box-shadow:0 8px 24px rgba(0,0,0,.8);}
+.nav-mobile.open{display:flex;}
+.nav-mobile a{color:#fff;text-decoration:none;font-family:'DM Sans',sans-serif;font-size:.9rem;font-weight:600;padding:14px 20px;border-bottom:1px solid rgba(255,255,255,.05);transition:background .2s,color .2s;}
+.nav-mobile a:hover{background:rgba(255,77,0,.1);color:#FF4D00;}
+.nav-mobile .nav-cta-m{color:#FF4D00;font-weight:700;letter-spacing:.5px;}
+@media(max-width:768px){.hamburger-btn{display:flex;}}
+/* === FIN HAMBURGER === */
     </style></head>
 <body>
 
@@ -542,7 +556,18 @@ footer{ background:#0D0D0D; border-top:1px solid rgba(255,255,255,0.05); padding
     <li><a href="#faq">FAQ</a></li>
     <li><a href="#precio" class="nav-cta">QUIERO ACCEDER</a></li>
   </ul>
+  <button class="hamburger-btn" id="hamburgerBtn" aria-label="Menú" onclick="toggleNavMobile()">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
+<div class="nav-mobile" id="navMobile">
+  <a href="#incluye" onclick="closeNavMobile()">¿Qué incluye?</a>
+  <a href="#beneficios" onclick="closeNavMobile()">Beneficios</a>
+  <a href="#optimizador" onclick="closeNavMobile()">Optimizador</a>
+  <a href="#precio" onclick="closeNavMobile()">Precio</a>
+  <a href="#faq" onclick="closeNavMobile()">FAQ</a>
+  <a href="#precio" class="nav-cta-m" onclick="closeNavMobile()">⚡ QUIERO ACCEDER</a>
+</div>
 
 <!-- HERO -->
 <div class="hero">
@@ -1497,4 +1522,14 @@ cargarResenas();
 }); // DOMContentLoaded
 </script>
 
+<script>
+function toggleNavMobile(){
+  document.getElementById('navMobile').classList.toggle('open');
+  document.getElementById('hamburgerBtn').classList.toggle('open');
+}
+function closeNavMobile(){
+  document.getElementById('navMobile').classList.remove('open');
+  document.getElementById('hamburgerBtn').classList.remove('open');
+}
+</script>
 <div id="claude-agent-glow-border" style="position: fixed; inset: 0px; pointer-events: none; z-index: 2147483646; opacity: 1; transition: opacity 0.3s ease-in-out; animation: 2s ease-in-out 0s infinite normal none running claude-pulse; box-shadow: rgba(217, 119, 87, 0.5) 0px 0px 10px inset, rgba(217, 119, 87, 0.3) 0px 0px 20px inset, rgba(217, 119, 87, 0.1) 0px 0px 30px inset; display: none;"></div></body></html>
