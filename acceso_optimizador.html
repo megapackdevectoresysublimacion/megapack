@@ -600,18 +600,39 @@ body{font-family:'DM Sans',sans-serif;background:#000;color:var(--blanco);overfl
   </div>
 
   <!-- SEC MOCKUP T-SHIRT MEN -->
-  <div class="sec" id="sec-mockup-men">
+  <div class="sec sec-rel" id="sec-mockup-men">
     <iframe src="mockup_creator_tshirt_men.html" style="width:100%;height:calc(100vh - 100px);border:none;display:block;"></iframe>
+    <div class="bloqueado" id="blMockupMen">
+      <div class="bl-ico">🔒</div>
+      <div class="bl-titulo">Tu prueba ha terminado</div>
+      <div class="bl-sub">Obtén acceso completo por 1 año</div>
+      <a href="https://pay.hotmart.com/F100830701W?off=afwr3u85" target="_blank" class="btn-comprar-grande">🔓 ACCESO COMPLETO $47 USD/AÑO</a>
+      <a href="https://wa.me/573171968082" target="_blank" class="btn-wa">💬 Contactar por WhatsApp</a>
+    </div>
   </div>
 
   <!-- SEC MOCKUP T-SHIRT GIRL -->
-  <div class="sec" id="sec-mockup-girl">
+  <div class="sec sec-rel" id="sec-mockup-girl">
     <iframe src="mockup_creator_tshirt_girl.html" style="width:100%;height:calc(100vh - 100px);border:none;display:block;"></iframe>
+    <div class="bloqueado" id="blMockupGirl">
+      <div class="bl-ico">🔒</div>
+      <div class="bl-titulo">Tu prueba ha terminado</div>
+      <div class="bl-sub">Obtén acceso completo por 1 año</div>
+      <a href="https://pay.hotmart.com/F100830701W?off=afwr3u85" target="_blank" class="btn-comprar-grande">🔓 ACCESO COMPLETO $47 USD/AÑO</a>
+      <a href="https://wa.me/573171968082" target="_blank" class="btn-wa">💬 Contactar por WhatsApp</a>
+    </div>
   </div>
 
   <!-- SEC MOCKUP MUG 3D -->
-  <div class="sec" id="sec-mockup-mug">
+  <div class="sec sec-rel" id="sec-mockup-mug">
     <iframe src="mockup_creator_Mug_3D.html" style="width:100%;height:calc(100vh - 100px);border:none;display:block;"></iframe>
+    <div class="bloqueado" id="blMockupMug">
+      <div class="bl-ico">🔒</div>
+      <div class="bl-titulo">Tu prueba ha terminado</div>
+      <div class="bl-sub">Obtén acceso completo por 1 año</div>
+      <a href="https://pay.hotmart.com/F100830701W?off=afwr3u85" target="_blank" class="btn-comprar-grande">🔓 ACCESO COMPLETO $47 USD/AÑO</a>
+      <a href="https://wa.me/573171968082" target="_blank" class="btn-wa">💬 Contactar por WhatsApp</a>
+    </div>
   </div>
 
 </div><!-- /portal -->
@@ -917,6 +938,9 @@ function actualizarBloqueos(){
   document.getElementById('blMentoria').style.display  = aVenc ? 'flex' : 'none';
   document.getElementById('blOptimizador').style.display = oVenc ? 'flex' : 'none';
   document.getElementById('blMegastudio').style.display = oVenc ? 'flex' : 'none';
+  document.getElementById('blMockupMen').style.display  = oVenc ? 'flex' : 'none';
+  document.getElementById('blMockupGirl').style.display = oVenc ? 'flex' : 'none';
+  document.getElementById('blMockupMug').style.display  = oVenc ? 'flex' : 'none';
 
   // ── UI según tipo de usuario ──
   const esVip = window._esVip === true;
