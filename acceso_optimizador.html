@@ -441,6 +441,7 @@ body{font-family:'DM Sans',sans-serif;background:#000;color:var(--blanco);overfl
           <div class="acc-ico">🎨</div>
           <div class="acc-titulo">Mockup Creator</div>
           <div class="acc-desc">Crea mockups profesionales de camisetas, mugs, gorras y más</div>
+          <span class="acc-timer" id="tMockup2">Cargando...</span>
         </div>
       </div>
       <p style="font-size:.75rem;color:var(--gris3);letter-spacing:1px;text-transform:uppercase;font-weight:700;margin-bottom:8px;">🎬 CÓMO INSTALAR GOOGLE DRIVE EN TU PC</p>
@@ -898,6 +899,7 @@ function tick(){
   const tO  = document.getElementById('tOptimizador');
   const tO2 = document.getElementById('tOptimizador2');
   const tM2 = document.getElementById('tMegastudio2');
+  const tMock2 = document.getElementById('tMockup2');
   if(dO > 0){
     const d = Math.floor(dO/86400000);
     const h = Math.floor((dO%86400000)/3600000);
@@ -905,10 +907,12 @@ function tick(){
     tO.textContent  = d+'d '+h+'h '+String(m).padStart(2,'0')+'m';
     tO2.textContent = d+' días, '+h+' horas, '+String(m).padStart(2,'0')+' min restantes';
     if(tM2) tM2.textContent = tO2.textContent;
+    if(tMock2) tMock2.textContent = tO2.textContent;
   } else {
     tO.textContent  = 'EXPIRADO';
     tO2.textContent = 'EXPIRADO';
     if(tM2) tM2.textContent = 'EXPIRADO';
+    if(tMock2) tMock2.textContent = 'EXPIRADO';
     actualizarBloqueos();
   }
 
