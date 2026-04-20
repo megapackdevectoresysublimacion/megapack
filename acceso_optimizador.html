@@ -232,6 +232,14 @@ body{font-family:'DM Sans',sans-serif;background:#000;color:var(--blanco);overfl
 .venc-card.visible{display:block;}
 .venc-titulo{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:2px;margin-bottom:8px;}
 
+/* DROPDOWN MOCKUP CREATOR */
+.nav-dropdown{position:relative;display:inline-block;}
+.nav-dropdown:hover .dd-menu,.nav-dropdown.open .dd-menu{display:block;}
+.dd-menu{display:none;position:absolute;top:calc(100% + 6px);left:0;background:var(--gris4);border:1px solid rgba(255,255,255,0.1);border-radius:10px;min-width:210px;z-index:200;padding:6px 0;box-shadow:0 8px 24px rgba(0,0,0,0.5);}
+.dd-menu button{display:block;width:100%;background:none;border:none;color:var(--gris3);font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:600;padding:10px 16px;cursor:pointer;text-align:left;transition:.2s;white-space:nowrap;}
+.dd-menu button:hover{color:var(--blanco);background:rgba(255,255,255,0.06);}
+.dd-trigger::after{content:'▾';margin-left:5px;font-size:.7rem;opacity:.7;}
+
 /* RESPONSIVE */
 @media(max-width:768px){
   .topbar-nav{display:none;}
@@ -361,6 +369,14 @@ body{font-family:'DM Sans',sans-serif;background:#000;color:var(--blanco);overfl
       <button class="nav-btn" onclick="irA('archivos',this)">🗂 Archivos</button>
       <button class="nav-btn" onclick="irA('mentoria',this)">📚 Mentoría</button>
       <button class="nav-btn" onclick="irA('compositor',this)">⚡ Optimizador Pro DTF Plus</button>
+      <div class="nav-dropdown">
+        <button class="nav-btn dd-trigger">🎨 Mockup Creator</button>
+        <div class="dd-menu">
+          <button onclick="irA('mockup-men',null)">👕 T-Shirt Men</button>
+          <button onclick="irA('mockup-girl',null)">👗 T-Shirt Girl</button>
+          <button onclick="irA('mockup-mug',null)">☕ Mug 3D</button>
+        </div>
+      </div>
     </nav>
     <div class="topbar-right">
       <img id="uAvatar" class="user-avatar" src="" alt="" style="display:none">
@@ -378,6 +394,9 @@ body{font-family:'DM Sans',sans-serif;background:#000;color:var(--blanco);overfl
     <button class="nav-btn" onclick="irAMobile('archivos',this)">🗂 Archivos</button>
     <button class="nav-btn" onclick="irAMobile('mentoria',this)">📚 Mentoría</button>
     <button class="nav-btn" onclick="irAMobile('compositor',this)">⚡ Optimizador Pro DTF Plus</button>
+    <button class="nav-btn" onclick="irAMobile('mockup-men',this)">👕 T-Shirt Men</button>
+    <button class="nav-btn" onclick="irAMobile('mockup-girl',this)">👗 T-Shirt Girl</button>
+    <button class="nav-btn" onclick="irAMobile('mockup-mug',this)">☕ Mug 3D</button>
   </div>
   <div id="menuOverlay" onclick="closeMenu()"></div>
 
@@ -417,6 +436,11 @@ body{font-family:'DM Sans',sans-serif;background:#000;color:var(--blanco);overfl
           <div class="acc-titulo">Optimizador Pro DTF Plus</div>
           <div class="acc-desc">Herramienta para optimizar tus impresiones y reducir desperdicios</div>
           <span class="acc-timer" id="tOptimizador2">Cargando...</span>
+        </div>
+        <div class="acc-card" onclick="irA('mockups',null)">
+          <div class="acc-ico">🎨</div>
+          <div class="acc-titulo">Mockup Creator</div>
+          <div class="acc-desc">Crea mockups profesionales de camisetas, mugs, gorras y más</div>
         </div>
       </div>
       <p style="font-size:.75rem;color:var(--gris3);letter-spacing:1px;text-transform:uppercase;font-weight:700;margin-bottom:8px;">🎬 CÓMO INSTALAR GOOGLE DRIVE EN TU PC</p>
@@ -532,6 +556,64 @@ body{font-family:'DM Sans',sans-serif;background:#000;color:var(--blanco);overfl
     </div>
   </div>
 
+  <!-- SEC MOCKUP CREATOR -->
+  <div class="sec sec-rel" id="sec-mockups">
+    <div class="bienvenido">
+      <div class="bv-titulo">🎨 <span>Mockup Creator</span></div>
+      <p class="bv-sub">Selecciona el tipo de mockup que quieres crear</p>
+      <div class="bv-accesos" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;">
+
+        <!-- Mockups Creator T-Shirt Men -->
+        <div class="acc-card" onclick="window.open('mockup_creator_tshirt_men.html','_blank')" style="cursor:pointer;">
+          <div class="acc-ico">👕</div>
+          <div class="acc-titulo">Mockups Creator<br>T-Shirt Men</div>
+          <div class="acc-desc">Camiseta masculina · 4 vistas · Export HD</div>
+          <span style="display:inline-block;margin-top:10px;font-size:.7rem;font-weight:700;color:#4caf50;letter-spacing:1px;">✓ DISPONIBLE</span>
+        </div>
+
+        <!-- Mockups Creator T-Shirt Girl -->
+        <div class="acc-card" style="opacity:.5;cursor:not-allowed;">
+          <div class="acc-ico">👗</div>
+          <div class="acc-titulo">Mockups Creator<br>T-Shirt Girl</div>
+          <div class="acc-desc">Camiseta femenina · 4 vistas · Export HD</div>
+          <span style="display:inline-block;margin-top:10px;font-size:.7rem;font-weight:700;color:var(--acento);letter-spacing:1px;">⏳ PRÓXIMAMENTE</span>
+        </div>
+
+        <!-- Mockups Creator Mugs -->
+        <div class="acc-card" onclick="window.open('mockup_creator_mugs.html','_blank')" style="cursor:pointer;">
+          <div class="acc-ico">☕</div>
+          <div class="acc-titulo">Mockups Creator<br>Mugs</div>
+          <div class="acc-desc">Tazas y mugs · 2 vistas · Export HD</div>
+          <span style="display:inline-block;margin-top:10px;font-size:.7rem;font-weight:700;color:#4caf50;letter-spacing:1px;">✓ DISPONIBLE</span>
+        </div>
+
+        <!-- Mockups Creator Gorras -->
+        <div class="acc-card" style="opacity:.5;cursor:not-allowed;">
+          <div class="acc-ico">🧢</div>
+          <div class="acc-titulo">Mockups Creator<br>Gorras</div>
+          <div class="acc-desc">Gorras y viseras · múltiples vistas · Export HD</div>
+          <span style="display:inline-block;margin-top:10px;font-size:.7rem;font-weight:700;color:var(--acento);letter-spacing:1px;">⏳ PRÓXIMAMENTE</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- SEC MOCKUP T-SHIRT MEN -->
+  <div class="sec" id="sec-mockup-men">
+    <iframe src="mockup_creator_tshirt_men.html" style="width:100%;height:calc(100vh - 100px);border:none;display:block;"></iframe>
+  </div>
+
+  <!-- SEC MOCKUP T-SHIRT GIRL -->
+  <div class="sec" id="sec-mockup-girl">
+    <iframe src="mockup_creator_tshirt_girl.html" style="width:100%;height:calc(100vh - 100px);border:none;display:block;"></iframe>
+  </div>
+
+  <!-- SEC MOCKUP MUG 3D -->
+  <div class="sec" id="sec-mockup-mug">
+    <iframe src="mockup_creator_Mug_3D.html" style="width:100%;height:calc(100vh - 100px);border:none;display:block;"></iframe>
+  </div>
+
 </div><!-- /portal -->
 
 <script>
@@ -579,102 +661,6 @@ const CLOUD_FUNCTION_URL = 'https://us-central1-optimizador-pro-dtf.cloudfunctio
 const HOTMART_URL = 'https://pay.hotmart.com/F100830701W?off=afwr3u85';
 
 let vencA, vencO, ticker;
-
-// ── SESIÓN ÚNICA & INACTIVIDAD ──────────────────────────────────────────────
-let _sessionToken        = null;
-let _sessionPollInterval = null;
-let _inactivityTimeout       = null;
-let _inactivityWarningTimeout= null;
-let _modalCountdownInterval  = null;
-const INACTIVIDAD_MS = 60 * 60 * 1000;   // 1 hora exacta → cerrar sesión
-const AVISO_MS       = 55 * 60 * 1000;   // 55 min → mostrar modal de aviso
-const COUNTDOWN_MS   =  5 * 60 * 1000;   // 5 min de cuenta regresiva en modal
-
-function _generarToken(){
-  return Math.random().toString(36).slice(2) + Date.now().toString(36);
-}
-
-function limpiarTimers(){
-  clearInterval(ticker);
-  clearInterval(_sessionPollInterval);
-  clearTimeout(_inactivityTimeout);
-  clearTimeout(_inactivityWarningTimeout);
-  clearInterval(_modalCountdownInterval);
-}
-
-// — Sesión única: graba token en Firestore, verifica cada 60 s —
-async function iniciarSesionUnica(uid){
-  _sessionToken = _generarToken();
-  sessionStorage.setItem('mpvip_session', _sessionToken);
-  try {
-    await db.collection('usuarios').doc(uid).update({ sessionToken: _sessionToken });
-  } catch(e){ console.warn('[SessionToken write]', e.message); }
-
-  _sessionPollInterval = setInterval(async () => {
-    try {
-      const snap = await db.collection('usuarios').doc(uid).get();
-      if(!snap.exists) return;
-      const remoto = snap.data().sessionToken;
-      if(remoto && remoto !== _sessionToken){
-        limpiarTimers();
-        alert('⚠️ Tu sesión fue iniciada en otro dispositivo. Serás desconectado.');
-        auth.signOut().then(() => window.location.reload());
-      }
-    } catch(e){ console.warn('[SessionPoll]', e.message); }
-  }, 60000);
-}
-
-// — Inactividad —
-function _ocultarModal(){
-  const m = document.getElementById('modalInactividad');
-  if(m) m.style.display = 'none';
-  clearInterval(_modalCountdownInterval);
-}
-
-function _mostrarModal(){
-  const m = document.getElementById('modalInactividad');
-  if(!m) return;
-  m.style.display = 'flex';
-  let restante = COUNTDOWN_MS;
-  function _tick(){
-    const min = Math.floor(restante / 60000);
-    const sec = Math.floor((restante % 60000) / 1000);
-    const el  = document.getElementById('modalCountdown');
-    if(el) el.textContent = String(min).padStart(2,'0') + ':' + String(sec).padStart(2,'0');
-    restante -= 1000;
-    if(restante < 0){
-      clearInterval(_modalCountdownInterval);
-      _ocultarModal();
-      limpiarTimers();
-      auth.signOut().then(() => window.location.reload());
-    }
-  }
-  _tick();
-  _modalCountdownInterval = setInterval(_tick, 1000);
-}
-
-function resetInactividad(){
-  clearTimeout(_inactivityTimeout);
-  clearTimeout(_inactivityWarningTimeout);
-  clearInterval(_modalCountdownInterval);
-  _ocultarModal();
-  _inactivityWarningTimeout = setTimeout(_mostrarModal, AVISO_MS);
-  _inactivityTimeout = setTimeout(() => {
-    limpiarTimers();
-    auth.signOut().then(() => window.location.reload());
-  }, INACTIVIDAD_MS);
-}
-
-function iniciarMonitorInactividad(){
-  ['mousemove','keydown','click','scroll','touchstart'].forEach(ev => {
-    document.addEventListener(ev, resetInactividad, { passive: true });
-  });
-  resetInactividad();
-}
-
-window.seguirConectado = function(){
-  resetInactividad();
-};
 
 function mostrar(id){
   document.getElementById('loading').style.display = 'none';
@@ -815,9 +801,6 @@ auth.onAuthStateChanged(async user => {
   // ── Llamar Cloud Function para dar acceso a Drive automáticamente ──
   darAccesoDrive(user);
 
-  // ── Sesión única: registrar token en Firestore ──
-  iniciarSesionUnica(user.uid);
-
   // ── Entrar al portal correspondiente tras 2s ──
   setTimeout(() => {
     mostrar('portal');
@@ -825,7 +808,6 @@ auth.onAuthStateChanged(async user => {
     irA('bienvenido', null);
     ticker = setInterval(tick, 1000);
     tick();
-    iniciarMonitorInactividad();
     // ── Mostrar temporizador Drive si es primera vez ──
     if(window._primerAcceso === true) {
       iniciarTemporizadorDrive();
@@ -1027,7 +1009,7 @@ function mostrarBtnDrive() {
 }
 
 window.cerrarSesion = function(){
-  limpiarTimers();
+  clearInterval(ticker);
   auth.signOut().then(() => {
     window.location.reload();
   });
@@ -1041,17 +1023,4 @@ window.cerrarSesion = function(){
   document.querySelectorAll('[data-logo]').forEach(function(i){i.src=LOGO;});
 })();
 </script>
-<!-- MODAL INACTIVIDAD -->
-<div id="modalInactividad" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.85);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);align-items:center;justify-content:center;">
-  <div style="background:#111;border:1px solid #FF4D00;border-radius:20px;padding:48px 40px;text-align:center;max-width:380px;width:90%;box-shadow:0 0 60px rgba(255,77,0,0.25);">
-    <div style="font-size:3.5rem;margin-bottom:12px;">⏳</div>
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:4px;color:#fff;margin-bottom:10px;">¿SIGUES AHÍ?</div>
-    <div style="color:rgba(255,255,255,0.6);font-size:.88rem;line-height:1.6;margin-bottom:24px;">Tu sesión se cerrará automáticamente por inactividad en:</div>
-    <div id="modalCountdown" style="font-family:'Bebas Neue',sans-serif;font-size:3.5rem;letter-spacing:6px;color:#FF4D00;margin-bottom:28px;line-height:1;">05:00</div>
-    <button onclick="seguirConectado()" style="display:inline-flex;align-items:center;justify-content:center;gap:8px;background:#FF4D00;color:#fff;border:none;border-radius:12px;padding:16px 36px;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:700;letter-spacing:.5px;cursor:pointer;box-shadow:0 4px 20px rgba(255,77,0,0.4);transition:transform .15s,box-shadow .15s;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 28px rgba(255,77,0,0.5)'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 20px rgba(255,77,0,0.4)'">
-      ✅ Seguir conectado
-    </button>
-  </div>
-</div>
-
 </body></html>
