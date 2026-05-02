@@ -234,7 +234,7 @@ body{font-family:'DM Sans',sans-serif;background:#000;color:var(--blanco);overfl
 
 /* DROPDOWN MOCKUP CREATOR */
 .nav-dropdown{position:relative;display:inline-block;}
-.nav-dropdown:hover .dd-menu,.nav-dropdown.open .dd-menu{display:block;}
+.nav-dropdown.open .dd-menu{display:block;}
 .dd-menu{display:none;position:absolute;top:calc(100% + 6px);left:0;background:var(--gris4);border:1px solid rgba(255,255,255,0.1);border-radius:10px;min-width:210px;z-index:200;padding:6px 0;box-shadow:0 8px 24px rgba(0,0,0,0.5);}
 .dd-menu button{display:block;width:100%;background:none;border:none;color:var(--gris3);font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:600;padding:10px 16px;cursor:pointer;text-align:left;transition:.2s;white-space:nowrap;}
 .dd-menu button:hover{color:var(--blanco);background:rgba(255,255,255,0.06);}
@@ -650,6 +650,15 @@ function closeMenu(){
   document.getElementById('mobileMenu').classList.remove('open');
   document.getElementById('menuOverlay').style.display = 'none';
 }
+// Dropdown Mockup Creator — click toggle
+document.addEventListener('click', function(e){
+  const dd = document.querySelector('.nav-dropdown');
+  if(dd.querySelector('.dd-trigger').contains(e.target)){
+    dd.classList.toggle('open');
+  } else {
+    dd.classList.remove('open');
+  }
+});
 function irAMobile(sec, btn){
   closeMenu();
   document.querySelectorAll('#mobileMenu .nav-btn').forEach(b => b.classList.remove('activo'));
