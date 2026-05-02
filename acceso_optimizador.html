@@ -760,8 +760,14 @@ auth.onAuthStateChanged(async user => {
     }
     if(d.tipoPlan === 'anual' && d.compro){
       window._esVip = true;
-      const f = new Date(d.fechaCompra || ahora);
-      vencA = new Date(f.getTime() + 365*24*3600000);
+      if(d.vencimientoPlan){
+        vencA = new Date(d.vencimientoPlan);
+      } else {
+        const f = d.fechaCompra ? new Date(d.fechaCompra) : ahora;
+        vencA = new Date(f.getTime() + 365*24*3600000);
+        ref.update({ vencimientoPlan: vencA.toISOString() }).catch(()=>{});
+        if(!d.fechaCompra) console.warn('[VIP auto-reparado]', user.email);
+      }
       vencO = vencA;
     } else {
       window._esVip = false;
