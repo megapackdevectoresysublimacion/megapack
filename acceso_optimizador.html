@@ -693,7 +693,11 @@ function mostrar(id){
   document.getElementById('login').style.display   = 'none';
   document.getElementById('portal').style.display  = 'none';
   if(id === 'login') document.getElementById('login').style.display = 'flex';
-  else if(id === 'portal') document.getElementById('portal').style.display = 'block';
+  else if(id === 'portal'){
+    document.getElementById('portal').style.display = 'block';
+    const glow = document.getElementById('claude-agent-glow-border');
+    if(glow) glow.style.display = 'none';
+  }
 }
 
 function loginGoogle(){
