@@ -81,7 +81,7 @@ body{font-family:'DM Sans',sans-serif;background:#000;color:var(--blanco);overfl
 #menuOverlay{display:none;position:fixed;inset:0;z-index:998;background:rgba(0,0,0,0.5);}
 
 /* SECCIONES */
-.sec{display:none;min-height:calc(100vh - 56px);}
+.sec{display:none;min-height:calc(100vh - 56px);overflow:hidden;}
 .sec.activa{display:block;}
 
 /* BIENVENIDO */
@@ -221,6 +221,7 @@ body{font-family:'DM Sans',sans-serif;background:#000;color:var(--blanco);overfl
 /* BLOQUEADO */
 .bloqueado{display:none;position:absolute;inset:0;background:rgba(0,0,0,0.92);backdrop-filter:blur(6px);z-index:10;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:32px 24px;}
 .sec-rel{position:relative;}
+.iframe-tool{width:100%;height:calc(100vh - 56px);border:none;display:block;vertical-align:top;}
 .bl-ico{font-size:3rem;margin-bottom:12px;}
 .bl-titulo{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:2px;margin-bottom:8px;}
 .bl-sub{color:var(--gris3);font-size:.85rem;margin-bottom:24px;max-width:400px;line-height:1.6;}
@@ -530,7 +531,7 @@ body{font-family:'DM Sans',sans-serif;background:#000;color:var(--blanco);overfl
 
   <!-- SEC OPTIMIZADOR -->
   <div class="sec sec-rel" id="sec-optimizador">
-    <iframe src="optimizador_pro_dtf.html" style="width:100%;height:calc(100vh - 100px);border:none;display:block;"></iframe>
+    <iframe src="optimizador_pro_dtf.html" class="iframe-tool"></iframe>
     <div class="bloqueado" id="blOptimizador">
       <div class="bl-ico">🔒</div>
       <div class="bl-titulo">Tu prueba ha terminado</div>
@@ -542,7 +543,7 @@ body{font-family:'DM Sans',sans-serif;background:#000;color:var(--blanco);overfl
 
   <!-- SEC MEGASTUDIO -->
   <div class="sec sec-rel" id="sec-compositor">
-    <iframe src="Optimizador_Pro_DTF_Plus.html" style="width:100%;height:calc(100vh - 100px);border:none;display:block;"></iframe>
+    <iframe src="Optimizador_Pro_DTF_Plus.html" class="iframe-tool"></iframe>
     <div class="bloqueado" id="blMegastudio">
       <div class="bl-ico">🔒</div>
       <div class="bl-titulo">Tu prueba ha terminado</div>
@@ -597,7 +598,7 @@ body{font-family:'DM Sans',sans-serif;background:#000;color:var(--blanco);overfl
 
   <!-- SEC MOCKUP T-SHIRT MEN -->
   <div class="sec sec-rel" id="sec-mockup-men">
-    <iframe src="mockup_creator_tshirt_men.html" style="width:100%;height:calc(100vh - 100px);border:none;display:block;"></iframe>
+    <iframe src="mockup_creator_tshirt_men.html" class="iframe-tool"></iframe>
     <div class="bloqueado" id="blMockupMen">
       <div class="bl-ico">🔒</div>
       <div class="bl-titulo">Tu prueba ha terminado</div>
@@ -609,7 +610,7 @@ body{font-family:'DM Sans',sans-serif;background:#000;color:var(--blanco);overfl
 
   <!-- SEC MOCKUP T-SHIRT GIRL -->
   <div class="sec sec-rel" id="sec-mockup-girl">
-    <iframe src="mockup_creator_tshirt_girl.html" style="width:100%;height:calc(100vh - 100px);border:none;display:block;"></iframe>
+    <iframe src="mockup_creator_tshirt_girl.html" class="iframe-tool"></iframe>
     <div class="bloqueado" id="blMockupGirl">
       <div class="bl-ico">🔒</div>
       <div class="bl-titulo">Tu prueba ha terminado</div>
@@ -621,7 +622,7 @@ body{font-family:'DM Sans',sans-serif;background:#000;color:var(--blanco);overfl
 
   <!-- SEC MOCKUP MUG 3D -->
   <div class="sec sec-rel" id="sec-mockup-mug">
-    <iframe src="mockup_creator_Mug_3D.html" style="width:100%;height:calc(100vh - 100px);border:none;display:block;"></iframe>
+    <iframe src="mockup_creator_Mug_3D.html" class="iframe-tool"></iframe>
     <div class="bloqueado" id="blMockupMug">
       <div class="bl-ico">🔒</div>
       <div class="bl-titulo">Tu prueba ha terminado</div>
