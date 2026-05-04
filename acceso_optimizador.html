@@ -687,6 +687,98 @@ const HORAS_OPTIMIZADOR = 72;
 const CLOUD_FUNCTION_URL = 'https://us-central1-optimizador-pro-dtf.cloudfunctions.net/darAccesoDrive';
 const HOTMART_URL = 'https://pay.hotmart.com/F100830701W?off=afwr3u85';
 
+// ── SESIÓN ÚNICA ──────────────────────────────────────────────
+let _sessionToken        = null;
+let _sessionPollInterval = null;
+
+function _generarToken(){
+  return Math.random().toString(36).slice(2) + Date.now().toString(36);
+}
+
+async function iniciarSesionUnica(uid){
+  _sessionToken = _generarToken();
+  sessionStorage.setItem('mpvip_session', _sessionToken);
+  try {
+    await db.collection('usuarios').doc(uid).update({ sessionToken: _sessionToken });
+  } catch(e){ console.warn('[SessionToken write]', e.message); }
+
+  _sessionPollInterval = setInterval(async () => {
+    try {
+      const snap = await db.collection('usuarios').doc(uid).get();
+      if(!snap.exists) return;
+      const remoto = snap.data().sessionToken;
+      if(remoto && remoto !== _sessionToken){
+        clearInterval(_sessionPollInterval);
+        clearInterval(ticker);
+        alert('⚠️ Tu sesión fue iniciada en otro dispositivo. Serás desconectado.');
+        auth.signOut().then(() => window.location.reload());
+      }
+    } catch(e){ console.warn('[SessionPoll]', e.message); }
+  }, 60000);
+}
+
+// ── CIERRE POR INACTIVIDAD ────────────────────────────────────
+const _INACT_MINUTOS = 60;
+const _AVISO_MINUTOS = 5;
+let _inactTimeout    = null;
+let _avisoTimeout    = null;
+let _avisoCountdown  = null;
+let _avisoVisible    = false;
+
+function _resetInactividad(){
+  if(_avisoVisible) return;
+  clearTimeout(_inactTimeout);
+  clearTimeout(_avisoTimeout);
+  _avisoTimeout = setTimeout(_mostrarAvisoInactividad, (_INACT_MINUTOS - _AVISO_MINUTOS) * 60000);
+  _inactTimeout = setTimeout(_cerrarPorInactividad, _INACT_MINUTOS * 60000);
+}
+
+function _mostrarAvisoInactividad(){
+  _avisoVisible = true;
+  let seg = _AVISO_MINUTOS * 60;
+  const fmt = s => `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
+
+  const overlay = document.createElement('div');
+  overlay.id = '_avisoInactOverlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.78);z-index:99999999;display:flex;align-items:center;justify-content:center;font-family:system-ui,-apple-system,sans-serif;';
+  overlay.innerHTML = '<div style="background:#1a1a1a;border:2px solid #f3be21;border-radius:16px;padding:44px 36px;max-width:460px;width:90%;text-align:center;box-shadow:0 0 50px rgba(243,190,33,0.5);"><div style="font-size:54px;margin-bottom:14px;">⏰</div><h2 style="color:#f3be21;margin:0 0 14px;font-size:26px;font-weight:bold;">Sesión por cerrar</h2><p style="color:#fff;margin:0 0 6px;font-size:16px;line-height:1.4;">Tu sesión se cerrará por inactividad en:</p><div id="_avisoInactCountdown" style="color:#fff;font-size:46px;font-weight:bold;margin:18px 0;font-variant-numeric:tabular-nums;">'+ fmt(seg) +'</div><button id="_avisoInactBtn" style="background:linear-gradient(90deg,#e74c1b,#f3be21);color:#000;border:none;padding:14px 36px;border-radius:8px;font-size:16px;font-weight:bold;cursor:pointer;">Seguir conectado</button></div>';
+  document.body.appendChild(overlay);
+
+  document.getElementById('_avisoInactBtn').addEventListener('click', _continuarSesion);
+
+  _avisoCountdown = setInterval(() => {
+    seg--;
+    const el = document.getElementById('_avisoInactCountdown');
+    if(el) el.textContent = fmt(seg);
+    if(seg <= 0) clearInterval(_avisoCountdown);
+  }, 1000);
+}
+
+function _continuarSesion(){
+  _avisoVisible = false;
+  clearInterval(_avisoCountdown);
+  const overlay = document.getElementById('_avisoInactOverlay');
+  if(overlay) overlay.remove();
+  _resetInactividad();
+}
+
+function _cerrarPorInactividad(){
+  _avisoVisible = false;
+  clearInterval(_avisoCountdown);
+  clearInterval(_sessionPollInterval);
+  clearInterval(ticker);
+  const overlay = document.getElementById('_avisoInactOverlay');
+  if(overlay) overlay.remove();
+  alert('⏰ Tu sesión se cerró por inactividad.');
+  auth.signOut().then(() => window.location.reload());
+}
+
+function _iniciarMonitorInactividad(){
+  document.addEventListener('click', _resetInactividad);
+  document.addEventListener('keydown', _resetInactividad);
+  _resetInactividad();
+}
+
 let vencA, vencO, ticker;
 
 function mostrar(id){
@@ -837,6 +929,12 @@ auth.onAuthStateChanged(async user => {
 
   // ── Llamar Cloud Function para dar acceso a Drive automáticamente ──
   darAccesoDrive(user);
+
+  // ── Sesión única: registrar token en Firestore ──
+  iniciarSesionUnica(user.uid);
+
+  // ── Iniciar monitor de inactividad (60 min) ──
+  _iniciarMonitorInactividad();
 
   // ── Entrar al portal correspondiente tras 2s ──
   setTimeout(() => {
@@ -1053,6 +1151,10 @@ function mostrarBtnDrive() {
 
 window.cerrarSesion = function(){
   clearInterval(ticker);
+  clearInterval(_sessionPollInterval);
+  clearTimeout(_inactTimeout);
+  clearTimeout(_avisoTimeout);
+  clearInterval(_avisoCountdown);
   auth.signOut().then(() => {
     window.location.reload();
   });
