@@ -779,6 +779,30 @@ function _iniciarMonitorInactividad(){
   _resetInactividad();
 }
 
+// ── DETECCIÓN DE ACTIVIDAD EN IFRAMES (Opción 3) ──────────────
+let _iframeKeepAliveInterval = null;
+
+function _iniciarMonitorIframes(){
+  window.addEventListener('blur', () => {
+    setTimeout(() => {
+      const ae = document.activeElement;
+      if(ae && ae.tagName === 'IFRAME' && ae.classList.contains('iframe-tool')){
+        _resetInactividad();
+        clearInterval(_iframeKeepAliveInterval);
+        _iframeKeepAliveInterval = setInterval(() => {
+          const cur = document.activeElement;
+          if(cur && cur.tagName === 'IFRAME' && cur.classList.contains('iframe-tool')){
+            _resetInactividad();
+          } else {
+            clearInterval(_iframeKeepAliveInterval);
+            _iframeKeepAliveInterval = null;
+          }
+        }, 15 * 60 * 1000);
+      }
+    }, 0);
+  });
+}
+
 let vencA, vencO, ticker;
 
 function mostrar(id){
@@ -935,6 +959,9 @@ auth.onAuthStateChanged(async user => {
 
   // ── Iniciar monitor de inactividad (60 min) ──
   _iniciarMonitorInactividad();
+
+  // ── Iniciar monitor de actividad en iframes ──
+  _iniciarMonitorIframes();
 
   // ── Entrar al portal correspondiente tras 2s ──
   setTimeout(() => {
@@ -1155,6 +1182,7 @@ window.cerrarSesion = function(){
   clearTimeout(_inactTimeout);
   clearTimeout(_avisoTimeout);
   clearInterval(_avisoCountdown);
+  clearInterval(_iframeKeepAliveInterval);
   auth.signOut().then(() => {
     window.location.reload();
   });
