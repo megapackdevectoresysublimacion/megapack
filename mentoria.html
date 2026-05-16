@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mentoría — MegaPack VIP</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+:root{
+  --negro:#000000; --blanco:#FAFAFA;
+  --acento:#FF4D00; --acento2:#FFB800;
+  --gris3:#888; --gris4:#1a1a1a; --gris5:#0D0D0D;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+body{
+  font-family:'DM Sans',sans-serif;
+  background:#000;
+  color:var(--blanco);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* MENTORIA */
+.mentoria-wrap{max-width:860px;margin:0 auto;padding:24px 20px;}
+.form-tabs{display:flex;gap:4px;margin-bottom:0;border-bottom:1px solid rgba(255,255,255,0.08);flex-wrap:wrap;}
+.ftab{background:transparent;border:none;color:var(--gris3);font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:600;padding:10px 14px;cursor:pointer;border-bottom:2px solid transparent;transition:.2s;}
+.ftab:hover{color:var(--blanco);}
+.ftab.activo{color:var(--acento);border-bottom-color:var(--acento);}
+.form-contenido{background:var(--gris5);border:1px solid rgba(255,255,255,0.06);border-top:none;border-radius:0 0 12px 12px;padding:24px;}
+.form-item{display:none;}
+.form-item.activo{display:block;}
+.form-item h3{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:1px;margin-bottom:4px;}
+.form-item p{color:var(--gris3);font-size:.82rem;line-height:1.6;margin-bottom:12px;}
+
+/* RESPONSIVE */
+@media(max-width:480px){
+  .form-tabs{gap:0;}
+  .ftab{font-size:.72rem;padding:10px 10px;}
+  .form-contenido{padding:18px 14px;}
+  .form-item h3{font-size:1.1rem;}
+  .mentoria-wrap{padding:16px 12px;}
+}
+  </style>
+</head>
+<body>
+
+  <div class="mentoria-wrap">
+    <div class="form-tabs">
+      <button class="ftab activo" onclick="cambiarTab('bits',this)">¿Qué es un Mapa de Bits?</button>
+      <button class="ftab" onclick="cambiarTab('vector',this)">¿Qué es un Vector?</button>
+      <button class="ftab" onclick="cambiarTab('sublimacion',this)">Organizar para Sublimación</button>
+      <button class="ftab" onclick="cambiarTab('dtf',this)">Organizar para DTF</button>
+    </div>
+    <div class="form-contenido">
+      <div class="form-item activo" id="tab-bits">
+        <h3>¿Qué es un Mapa de Bits?</h3>
+        <div style="position:relative;padding-bottom:56.25%;border-radius:10px;overflow:hidden;border:1px solid rgba(255,77,0,0.2);margin-top:12px;">
+          <iframe src="https://www.youtube.com/embed/DX1MJxKyu9E" title="Mapa de Bits" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:none;"></iframe>
+        </div>
+      </div>
+      <div class="form-item" id="tab-vector">
+        <h3>¿Qué es un Gráfico Vectorial?</h3>
+        <div style="position:relative;padding-bottom:56.25%;border-radius:10px;overflow:hidden;border:1px solid rgba(255,77,0,0.2);margin-top:12px;">
+          <iframe src="https://www.youtube.com/embed/ArXG5AUT8Bg" title="Vector" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:none;"></iframe>
+        </div>
+      </div>
+      <div class="form-item" id="tab-sublimacion">
+        <h3>Organizar para Sublimación con Photoshop</h3>
+        <div style="position:relative;padding-bottom:56.25%;border-radius:10px;overflow:hidden;border:1px solid rgba(255,77,0,0.2);margin-top:12px;">
+          <iframe src="https://www.youtube.com/embed/ldrusqciNrc" title="Sublimación" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:none;"></iframe>
+        </div>
+      </div>
+      <div class="form-item" id="tab-dtf">
+        <h3>Organizar para DTF con Photoshop</h3>
+        <div style="position:relative;padding-bottom:56.25%;border-radius:10px;overflow:hidden;border:1px solid rgba(255,77,0,0.2);margin-top:12px;">
+          <iframe src="https://www.youtube.com/embed/v0cTBwvQBYk" title="DTF" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:none;"></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+function cambiarTab(tab, btn){
+  document.querySelectorAll('.form-item').forEach(f => f.classList.remove('activo'));
+  document.querySelectorAll('.ftab').forEach(b => b.classList.remove('activo'));
+  document.getElementById('tab-'+tab).classList.add('activo');
+  btn.classList.add('activo');
+}
+</script>
+
+</body>
+</html>
