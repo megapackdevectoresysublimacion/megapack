@@ -153,7 +153,10 @@ if (window.self === window.top) {
   window.location.replace('acceso_optimizador.html');
 }
 
-// ─── Firebase ───
+// ─── Firebase: REUSAR la instancia del padre para evitar conflicto de auth ───
+// El padre (acceso_optimizador.html) ya inicializa Firebase. Reusamos su
+// instancia para no crear una segunda instancia de Auth que rompa el popup
+// de signInWithPopup() del padre.
 const FB = {
   apiKey:"AIzaSyA-59q3N-iQdtUEO5SXESZZ3DCcK1WCl-k",
   authDomain:"optimizador-pro-dtf.firebaseapp.com",
@@ -162,20 +165,41 @@ const FB = {
   messagingSenderId:"497164758708",
   appId:"1:497164758708:web:1adbd3ebb9a2f441abb1e1"
 };
-firebase.initializeApp(FB);
-const auth = firebase.auth();
-const db = firebase.firestore();
+
+let app, parentFb;
+try {
+  if (window.self !== window.top &&
+      window.parent.firebase &&
+      window.parent.firebase.apps.length > 0) {
+    // Caso normal: estamos en iframe → usar la app del padre
+    parentFb = window.parent.firebase;
+    app = parentFb.app();
+  } else {
+    // Fallback: standalone (el frame-busting ya redirigió, pero por seguridad)
+    app = firebase.initializeApp(FB);
+    parentFb = firebase;
+  }
+} catch (e) {
+  app = firebase.initializeApp(FB);
+  parentFb = firebase;
+}
+const db = app.firestore();
 
 let secciones = [];
 let seccionActivaIdx = 0;
 let leccionActivaIdx = 0;
+let yaCargado = false;
 
-auth.onAuthStateChanged(async user => {
-  if (!user) {
-    try { window.parent.location.replace('acceso_optimizador.html'); }
-    catch(e){ window.location.replace('acceso_optimizador.html'); }
-    return;
-  }
+// Suscribirse al auth del padre (no creamos una segunda instancia, solo
+// registramos un listener en la auth ya existente del padre).
+parentFb.auth().onAuthStateChanged(async user => {
+  if (yaCargado) return; // Solo cargar una vez por sesión
+  if (!user) return;     // Esperar a que haya usuario logueado
+  yaCargado = true;
+  await cargarMentoria();
+});
+
+async function cargarMentoria(){
   try {
     const snap = await db.collection('configuracion').doc('mentoria').get();
     if (!snap.exists) {
@@ -196,7 +220,7 @@ auth.onAuthStateChanged(async user => {
     console.error(err);
     mostrarVacio('Error cargando contenido. Recarga la página o contacta al administrador.');
   }
-});
+}
 
 function renderSidebar(){
   const nav = document.getElementById('navSecciones');
