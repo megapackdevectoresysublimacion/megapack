@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Migrar Mentoría — Setup v2</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,-apple-system,sans-serif;}
+    body{background:#0d0d0d;color:#fafafa;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
+    .card{background:#1a1a1a;border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:32px;max-width:560px;width:100%;}
+    h1{font-size:1.5rem;margin-bottom:8px;color:#FF4D00;}
+    .sub{color:#888;font-size:.9rem;margin-bottom:24px;line-height:1.5;}
+    .step{background:#0d0d0d;border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:16px;margin-bottom:12px;display:flex;align-items:center;gap:12px;font-size:.9rem;}
+    .step-num{background:#FF4D00;color:#fff;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;font-size:.8rem;}
+    .step.done{border-color:#10b981;}
+    .step.done .step-num{background:#10b981;}
+    .step.error{border-color:#ef4444;}
+    .step.error .step-num{background:#ef4444;}
+    button{background:#FF4D00;color:#fff;border:none;padding:14px 24px;border-radius:10px;font-size:1rem;font-weight:600;cursor:pointer;width:100%;margin-top:8px;transition:.2s;}
+    button:hover{background:#e84500;}
+    button:disabled{background:#444;cursor:not-allowed;opacity:.6;}
+    .log{background:#000;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:12px;margin-top:16px;font-family:'Courier New',monospace;font-size:.8rem;max-height:240px;overflow-y:auto;color:#10b981;display:none;}
+    .log.visible{display:block;}
+    .log .err{color:#ef4444;}
+    .log .info{color:#3b82f6;}
+    .warn{background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.3);color:#fbbf24;padding:12px;border-radius:8px;font-size:.82rem;margin-bottom:16px;line-height:1.5;}
+    .success{background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);color:#10b981;padding:14px;border-radius:8px;font-size:.9rem;margin-top:16px;display:none;line-height:1.5;}
+    .success.visible{display:block;}
+    code{background:#000;padding:2px 6px;border-radius:4px;font-size:.85em;color:#fbbf24;}
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <h1>🛠️ Migrar Mentoría — Estructura Profesional</h1>
+  <p class="sub">Convierte el modelo plano de tabs al nuevo modelo de Secciones → Lecciones → Bloques. Es la base para crecer con más tutoriales.</p>
+
+  <div class="warn">
+    ⚠️ Este script <strong>sobrescribe</strong> el documento <code>configuracion/mentoria</code> con la nueva estructura. Solo correlo UNA vez. Bórralo después de usar.
+  </div>
+
+  <div class="step" id="step1">
+    <div class="step-num">1</div>
+    <div>Iniciar sesión con la cuenta admin</div>
+  </div>
+  <div class="step" id="step2">
+    <div class="step-num">2</div>
+    <div>Verificar admin</div>
+  </div>
+  <div class="step" id="step3">
+    <div class="step-num">3</div>
+    <div>Escribir estructura nueva en Firestore</div>
+  </div>
+
+  <button id="btnRun" onclick="ejecutar()">▶️ Migrar estructura</button>
+
+  <div class="log" id="log"></div>
+
+  <div class="success" id="success">
+    ✅ <strong>¡Migración completada!</strong><br><br>
+    El documento <code>configuracion/mentoria</code> ahora tiene la nueva estructura: 2 secciones lógicas, cada una con sus lecciones y bloques.<br><br>
+    <strong>Siguiente paso:</strong> bórrate este archivo (<code>migrar-mentoria.html</code>) del repo.
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+<script>
+const FB = {
+  apiKey:"AIzaSyA-59q3N-iQdtUEO5SXESZZ3DCcK1WCl-k",
+  authDomain:"optimizador-pro-dtf.firebaseapp.com",
+  projectId:"optimizador-pro-dtf",
+  storageBucket:"optimizador-pro-dtf.firebasestorage.app",
+  messagingSenderId:"497164758708",
+  appId:"1:497164758708:web:1adbd3ebb9a2f441abb1e1"
+};
+
+firebase.initializeApp(FB);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+const logEl = document.getElementById('log');
+const successEl = document.getElementById('success');
+const btnRun = document.getElementById('btnRun');
+
+function log(msg, tipo='ok'){
+  logEl.classList.add('visible');
+  const line = document.createElement('div');
+  line.className = tipo;
+  line.textContent = '> ' + msg;
+  logEl.appendChild(line);
+  logEl.scrollTop = logEl.scrollHeight;
+}
+
+function marcar(stepId, estado){
+  const el = document.getElementById(stepId);
+  el.classList.remove('done','error');
+  if(estado) el.classList.add(estado);
+}
+
+// ── NUEVO MODELO: Secciones → Lecciones → Bloques ──
+const datosNuevos = {
+  secciones: [
+    {
+      titulo: "Conceptos Básicos",
+      descripcion: "Fundamentos que debes conocer antes de empezar a crear",
+      lecciones: [
+        {
+          titulo: "¿Qué es un Mapa de Bits?",
+          descripcion: "Aprende qué es una imagen rasterizada y cuándo usarla",
+          bloques: [
+            { tipo: "video", videoId: "DX1MJxKyu9E" }
+          ]
+        },
+        {
+          titulo: "¿Qué es un Vector?",
+          descripcion: "Conoce los gráficos vectoriales y sus ventajas",
+          bloques: [
+            { tipo: "video", videoId: "ArXG5AUT8Bg" }
+          ]
+        }
+      ]
+    },
+    {
+      titulo: "Organización de Archivos",
+      descripcion: "Aprende a preparar tus archivos correctamente para cada técnica",
+      lecciones: [
+        {
+          titulo: "Organizar para Sublimación",
+          descripcion: "Configura tus archivos en Photoshop para sublimación",
+          bloques: [
+            { tipo: "video", videoId: "ldrusqciNrc" }
+          ]
+        },
+        {
+          titulo: "Organizar para DTF",
+          descripcion: "Prepara tus archivos correctamente para impresión DTF",
+          bloques: [
+            { tipo: "video", videoId: "v0cTBwvQBYk" }
+          ]
+        }
+      ]
+    }
+  ],
+  version: 2,
+  actualizadoEn: firebase.firestore.FieldValue.serverTimestamp()
+};
+
+async function ejecutar(){
+  btnRun.disabled = true;
+  btnRun.textContent = 'Ejecutando...';
+  logEl.classList.add('visible');
+  logEl.innerHTML = '';
+  successEl.classList.remove('visible');
+
+  try {
+    log('Iniciando sesión con Google...', 'info');
+    const provider = new firebase.auth.GoogleAuthProvider();
+    const result = await auth.signInWithPopup(provider);
+    const user = result.user;
+    log(`Sesión iniciada: ${user.email}`);
+    log(`UID: ${user.uid}`, 'info');
+    marcar('step1','done');
+
+    log('Verificando estatus de admin...', 'info');
+    const adminDoc = await db.collection('admins').doc(user.uid).get();
+    if(!adminDoc.exists){
+      log(`ERROR: La cuenta ${user.email} NO está en admins/`, 'err');
+      marcar('step2','error');
+      btnRun.disabled = false;
+      btnRun.textContent = '🔄 Reintentar';
+      return;
+    }
+    log(`Admin verificado: ${adminDoc.data().nombre || user.email}`);
+    marcar('step2','done');
+
+    log('Escribiendo nueva estructura en Firestore...', 'info');
+    await db.collection('configuracion').doc('mentoria').set(datosNuevos);
+    log(`Estructura nueva: ${datosNuevos.secciones.length} secciones, ${datosNuevos.secciones.reduce((a,s)=>a+s.lecciones.length,0)} lecciones totales.`);
+    marcar('step3','done');
+
+    successEl.classList.add('visible');
+    btnRun.textContent = '✅ Completado';
+    log('Migración finalizada correctamente.', 'info');
+
+  } catch(error){
+    log(`ERROR: ${error.message}`, 'err');
+    btnRun.disabled = false;
+    btnRun.textContent = '🔄 Reintentar';
+  }
+}
+</script>
+
+</body>
+</html>
