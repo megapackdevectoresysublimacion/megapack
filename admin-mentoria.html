@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Mentoría — MegaPack</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+:root{
+  --negro:#000; --blanco:#FAFAFA;
+  --acento:#FF4D00; --acento2:#FFB800;
+  --ok:#10b981; --err:#ef4444; --warn:#fbbf24; --info:#3b82f6;
+  --gris1:#CCC; --gris2:#999; --gris3:#666; --gris4:#1a1a1a; --gris5:#0D0D0D;
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'DM Sans',sans-serif;}
+body{background:#000;color:var(--blanco);min-height:100vh;}
+
+/* LOGIN */
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
+.login-card{background:var(--gris4);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:36px;max-width:420px;width:100%;text-align:center;}
+.login-card h1{font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--acento);letter-spacing:2px;margin-bottom:6px;}
+.login-card .sub{color:var(--gris2);font-size:.88rem;margin-bottom:24px;}
+.btn-google{background:#fff;color:#444;border:none;padding:13px 24px;border-radius:10px;font-weight:600;cursor:pointer;font-size:.92rem;width:100%;display:flex;align-items:center;justify-content:center;gap:10px;transition:.15s;}
+.btn-google:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(255,77,0,0.2);}
+.login-error{color:var(--err);font-size:.85rem;margin-top:16px;display:none;}
+.login-error.visible{display:block;}
+
+/* HEADER */
+.topbar{background:var(--gris5);border-bottom:1px solid rgba(255,255,255,0.06);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.topbar-left{display:flex;align-items:center;gap:14px;}
+.topbar-titulo{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:var(--acento);letter-spacing:1.5px;}
+.topbar-sub{font-size:.7rem;color:var(--gris2);letter-spacing:.5px;text-transform:uppercase;}
+.topbar-right{display:flex;align-items:center;gap:12px;}
+.topbar-user{font-size:.82rem;color:var(--gris1);}
+.btn-salir{background:transparent;border:1px solid rgba(255,255,255,0.15);color:var(--gris1);padding:7px 14px;border-radius:8px;font-size:.78rem;cursor:pointer;transition:.15s;}
+.btn-salir:hover{background:rgba(239,68,68,0.1);border-color:var(--err);color:var(--err);}
+.btn-guardar{background:var(--ok);color:#fff;border:none;padding:10px 20px;border-radius:8px;font-size:.85rem;font-weight:600;cursor:pointer;transition:.15s;display:flex;align-items:center;gap:6px;}
+.btn-guardar:hover{background:#0d9c6f;}
+.btn-guardar:disabled{background:#444;cursor:not-allowed;opacity:.6;}
+.estado-guardado{font-size:.75rem;color:var(--gris2);}
+
+/* LAYOUT */
+.app{max-width:1200px;margin:0 auto;padding:24px;}
+.app-header{margin-bottom:24px;}
+.app-header h2{font-family:'Bebas Neue',sans-serif;font-size:1.7rem;letter-spacing:1.5px;margin-bottom:6px;}
+.app-header p{color:var(--gris2);font-size:.88rem;}
+
+/* SECCIONES */
+.secciones-lista{display:flex;flex-direction:column;gap:14px;}
+.seccion-card{background:var(--gris5);border:1px solid rgba(255,255,255,0.06);border-radius:12px;overflow:hidden;}
+.seccion-card.expandida{border-color:rgba(255,77,0,0.3);}
+.seccion-head{padding:16px 18px;display:flex;align-items:center;gap:12px;cursor:pointer;user-select:none;}
+.seccion-head:hover{background:rgba(255,255,255,0.02);}
+.seccion-handle{color:var(--gris3);font-size:1rem;cursor:grab;}
+.seccion-num{background:var(--acento);color:#fff;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:700;flex-shrink:0;}
+.seccion-info{flex:1;min-width:0;}
+.seccion-tit{font-weight:600;font-size:.95rem;color:var(--blanco);}
+.seccion-meta{font-size:.74rem;color:var(--gris2);margin-top:2px;}
+.seccion-actions{display:flex;gap:6px;}
+.btn-icon{background:transparent;border:1px solid rgba(255,255,255,0.1);color:var(--gris1);padding:6px 10px;border-radius:6px;cursor:pointer;font-size:.78rem;transition:.15s;}
+.btn-icon:hover{background:rgba(255,255,255,0.05);color:var(--blanco);}
+.btn-icon.danger:hover{background:rgba(239,68,68,0.1);border-color:var(--err);color:var(--err);}
+
+.seccion-body{padding:0 18px 18px;border-top:1px solid rgba(255,255,255,0.04);display:none;}
+.seccion-card.expandida .seccion-body{display:block;}
+.seccion-body-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0;}
+.campo{display:flex;flex-direction:column;gap:5px;}
+.campo label{font-size:.75rem;color:var(--gris2);font-weight:500;letter-spacing:.3px;}
+.campo input,.campo textarea,.campo select{background:#000;border:1px solid rgba(255,255,255,0.1);color:var(--blanco);padding:9px 12px;border-radius:7px;font-size:.86rem;font-family:'DM Sans',sans-serif;transition:.15s;}
+.campo input:focus,.campo textarea:focus,.campo select:focus{outline:none;border-color:var(--acento);}
+.campo textarea{resize:vertical;min-height:64px;}
+
+/* LECCIONES */
+.lecciones-titulo{font-size:.78rem;text-transform:uppercase;letter-spacing:1px;color:var(--gris2);margin:18px 0 8px;font-weight:600;}
+.lecciones-lista{display:flex;flex-direction:column;gap:10px;}
+.leccion-card{background:var(--gris4);border:1px solid rgba(255,255,255,0.05);border-radius:10px;overflow:hidden;}
+.leccion-card.expandida{border-color:rgba(255,184,0,0.3);}
+.leccion-head{padding:12px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;}
+.leccion-head:hover{background:rgba(255,255,255,0.02);}
+.leccion-num{background:var(--acento2);color:#000;min-width:24px;height:22px;padding:0 6px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;flex-shrink:0;}
+.leccion-info{flex:1;min-width:0;}
+.leccion-tit{font-weight:500;font-size:.86rem;color:var(--blanco);}
+.leccion-meta{font-size:.7rem;color:var(--gris2);margin-top:1px;}
+.leccion-body{padding:0 14px 14px;border-top:1px solid rgba(255,255,255,0.04);display:none;}
+.leccion-card.expandida .leccion-body{display:block;}
+
+/* BLOQUES */
+.bloques-titulo{font-size:.72rem;text-transform:uppercase;letter-spacing:1px;color:var(--gris2);margin:14px 0 6px;font-weight:600;}
+.bloque-card{background:#000;border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:12px;margin-bottom:8px;}
+.bloque-head{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.bloque-tipo-label{background:rgba(255,77,0,0.15);color:var(--acento);padding:3px 9px;border-radius:5px;font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.5px;}
+.bloque-tipo-label.texto{background:rgba(59,130,246,0.15);color:var(--info);}
+.bloque-tipo-label.imagen{background:rgba(251,191,36,0.15);color:var(--warn);}
+.bloque-actions{margin-left:auto;display:flex;gap:5px;}
+.bloque-body{display:flex;flex-direction:column;gap:8px;}
+
+/* BOTÓN AGREGAR */
+.btn-add{background:transparent;border:1.5px dashed rgba(255,255,255,0.15);color:var(--gris1);padding:11px;border-radius:8px;cursor:pointer;width:100%;font-size:.85rem;font-weight:500;transition:.15s;margin-top:10px;}
+.btn-add:hover{border-color:var(--acento);color:var(--acento);background:rgba(255,77,0,0.05);}
+.btn-add-tiny{font-size:.78rem;padding:8px;margin-top:6px;}
+
+/* MODALES */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100;align-items:center;justify-content:center;padding:20px;}
+.modal-bg.visible{display:flex;}
+.modal{background:var(--gris4);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:28px;max-width:440px;width:100%;}
+.modal h3{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:1.3px;margin-bottom:6px;}
+.modal p{color:var(--gris2);font-size:.85rem;margin-bottom:18px;line-height:1.5;}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:20px;}
+.btn-secondary{background:transparent;border:1px solid rgba(255,255,255,0.15);color:var(--gris1);padding:9px 16px;border-radius:8px;cursor:pointer;font-size:.85rem;}
+.btn-primary{background:var(--acento);color:#fff;border:none;padding:9px 16px;border-radius:8px;cursor:pointer;font-size:.85rem;font-weight:600;}
+.btn-danger{background:var(--err);color:#fff;border:none;padding:9px 16px;border-radius:8px;cursor:pointer;font-size:.85rem;font-weight:600;}
+
+/* TIPO SELECTOR (modal agregar bloque) */
+.tipo-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:10px 0;}
+.tipo-opcion{background:#000;border:2px solid rgba(255,255,255,0.08);padding:18px 10px;border-radius:10px;cursor:pointer;text-align:center;transition:.15s;}
+.tipo-opcion:hover{border-color:var(--acento);}
+.tipo-opcion.sel{border-color:var(--acento);background:rgba(255,77,0,0.08);}
+.tipo-ico{font-size:1.5rem;margin-bottom:5px;}
+.tipo-nombre{font-size:.78rem;font-weight:600;}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;padding:14px 20px;border-radius:10px;font-size:.88rem;font-weight:500;box-shadow:0 8px 24px rgba(0,0,0,0.5);transform:translateY(100px);opacity:0;transition:.3s;z-index:200;}
+.toast.visible{transform:translateY(0);opacity:1;}
+.toast.ok{background:var(--ok);color:#fff;}
+.toast.err{background:var(--err);color:#fff;}
+.toast.info{background:var(--info);color:#fff;}
+
+/* AYUDA */
+.help{font-size:.72rem;color:var(--gris3);margin-top:4px;line-height:1.4;}
+.help code{background:#000;padding:1px 5px;border-radius:3px;color:var(--acento2);font-size:.95em;}
+
+/* RESPONSIVE */
+@media(max-width:680px){
+  .topbar{padding:12px 16px;}
+  .topbar-user{display:none;}
+  .app{padding:14px;}
+  .seccion-body-grid{grid-template-columns:1fr;}
+  .seccion-head{padding:12px 14px;}
+  .modal{padding:20px;}
+  .tipo-grid{grid-template-columns:1fr;}
+}
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-wrap" id="loginWrap">
+  <div class="login-card">
+    <h1>🛠️ ADMIN MENTORÍA</h1>
+    <div class="sub">Panel de administración del contenido</div>
+    <button class="btn-google" onclick="loginGoogle()">
+      <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84c-.21 1.13-.84 2.08-1.79 2.72v2.26h2.9c1.7-1.56 2.69-3.87 2.69-6.62z"/><path fill="#34A853" d="M9 18c2.43 0 4.46-.8 5.95-2.18l-2.9-2.26c-.81.54-1.83.86-3.05.86-2.34 0-4.33-1.58-5.04-3.71H.96v2.33C2.44 15.98 5.48 18 9 18z"/><path fill="#FBBC05" d="M3.96 10.71c-.18-.54-.28-1.12-.28-1.71 0-.59.1-1.17.28-1.71V4.96H.96A8.997 8.997 0 0 0 0 9c0 1.45.35 2.83.96 4.04l3-2.33z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58C13.46.89 11.43 0 9 0 5.48 0 2.44 2.02.96 4.96l3 2.33C4.67 5.16 6.66 3.58 9 3.58z"/></svg>
+      Iniciar sesión con Google
+    </button>
+    <div class="login-error" id="loginError"></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="appWrap" style="display:none;">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div>
+        <div class="topbar-titulo">🛠️ ADMIN MENTORÍA</div>
+        <div class="topbar-sub">Panel de administración</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <span class="estado-guardado" id="estadoGuardado"></span>
+      <button class="btn-guardar" id="btnGuardar" onclick="guardarCambios()">💾 Guardar cambios</button>
+      <span class="topbar-user" id="topbarUser"></span>
+      <button class="btn-salir" onclick="cerrarSesion()">Salir</button>
+    </div>
+  </div>
+
+  <div class="app">
+    <div class="app-header">
+      <h2>Gestión de contenido</h2>
+      <p>Agrega, edita, reordena y elimina secciones, lecciones y bloques. Los cambios se publican al hacer click en <strong>Guardar cambios</strong>.</p>
+    </div>
+
+    <div class="secciones-lista" id="seccionesLista"></div>
+
+    <button class="btn-add" onclick="agregarSeccion()">➕ Agregar nueva sección</button>
+  </div>
+</div>
+
+<!-- MODAL CONFIRMAR -->
+<div class="modal-bg" id="modalConfirm">
+  <div class="modal">
+    <h3 id="confirmTitulo">¿Confirmar?</h3>
+    <p id="confirmMsg">Esta acción no se puede deshacer.</p>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="cerrarModal('modalConfirm')">Cancelar</button>
+      <button class="btn-danger" id="confirmBtn">Eliminar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL AGREGAR BLOQUE -->
+<div class="modal-bg" id="modalBloque">
+  <div class="modal">
+    <h3>Agregar bloque</h3>
+    <p>Elige el tipo de contenido que quieres agregar a esta lección.</p>
+    <div class="tipo-grid">
+      <div class="tipo-opcion" data-tipo="video" onclick="seleccionarTipo('video')">
+        <div class="tipo-ico">🎥</div>
+        <div class="tipo-nombre">Video</div>
+      </div>
+      <div class="tipo-opcion" data-tipo="texto" onclick="seleccionarTipo('texto')">
+        <div class="tipo-ico">📝</div>
+        <div class="tipo-nombre">Texto</div>
+      </div>
+      <div class="tipo-opcion" data-tipo="imagen" onclick="seleccionarTipo('imagen')">
+        <div class="tipo-ico">🖼️</div>
+        <div class="tipo-nombre">Imagen</div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="cerrarModal('modalBloque')">Cancelar</button>
+      <button class="btn-primary" onclick="confirmarTipoBloque()">Agregar</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+<script>
+const FB = {
+  apiKey:"AIzaSyA-59q3N-iQdtUEO5SXESZZ3DCcK1WCl-k",
+  authDomain:"optimizador-pro-dtf.firebaseapp.com",
+  projectId:"optimizador-pro-dtf",
+  storageBucket:"optimizador-pro-dtf.firebasestorage.app",
+  messagingSenderId:"497164758708",
+  appId:"1:497164758708:web:1adbd3ebb9a2f441abb1e1"
+};
+firebase.initializeApp(FB);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+// ─── Estado ───
+let estado = { secciones: [] };
+let estadoCambiado = false;
+let bloqueTipoSeleccionado = null;
+let bloqueDestino = null;
+let usuario = null;
+
+// ─── Login ───
+function loginGoogle(){
+  const provider = new firebase.auth.GoogleAuthProvider();
+  auth.signInWithPopup(provider).catch(err => {
+    document.getElementById('loginError').textContent = 'Error de login: ' + err.message;
+    document.getElementById('loginError').classList.add('visible');
+  });
+}
+
+function cerrarSesion(){
+  if (estadoCambiado && !confirm('Tienes cambios sin guardar. ¿Salir igual?')) return;
+  auth.signOut().then(() => location.reload());
+}
+
+auth.onAuthStateChanged(async user => {
+  if (!user) {
+    document.getElementById('loginWrap').style.display = 'flex';
+    document.getElementById('appWrap').style.display = 'none';
+    return;
+  }
+  // Verificar admin
+  try {
+    const doc = await db.collection('admins').doc(user.uid).get();
+    if (!doc.exists){
+      document.getElementById('loginError').textContent = `❌ La cuenta ${user.email} no tiene permisos de administrador.`;
+      document.getElementById('loginError').classList.add('visible');
+      auth.signOut();
+      return;
+    }
+    usuario = user;
+    document.getElementById('topbarUser').textContent = user.displayName || user.email;
+    document.getElementById('loginWrap').style.display = 'none';
+    document.getElementById('appWrap').style.display = 'block';
+    await cargarMentoria();
+  } catch (e) {
+    document.getElementById('loginError').textContent = 'Error verificando permisos: ' + e.message;
+    document.getElementById('loginError').classList.add('visible');
+  }
+});
+
+// ─── Carga inicial ───
+async function cargarMentoria(){
+  try {
+    const snap = await db.collection('configuracion').doc('mentoria').get();
+    if (snap.exists){
+      const data = snap.data();
+      estado = { secciones: data.secciones || [] };
+    } else {
+      estado = { secciones: [] };
+    }
+    renderApp();
+    actualizarEstadoGuardado('Sin cambios');
+  } catch (e) {
+    toast('Error cargando contenido: ' + e.message, 'err');
+  }
+}
+
+// ─── Render principal ───
+function renderApp(){
+  const cont = document.getElementById('seccionesLista');
+  if (estado.secciones.length === 0){
+    cont.innerHTML = `<div style="text-align:center;padding:40px;color:var(--gris2);font-size:.9rem;">No hay secciones aún. Click en "Agregar nueva sección" para empezar.</div>`;
+    return;
+  }
+  cont.innerHTML = estado.secciones.map((sec, sIdx) => renderSeccion(sec, sIdx)).join('');
+}
+
+function renderSeccion(sec, sIdx){
+  const cantLec = (sec.lecciones || []).length;
+  return `
+    <div class="seccion-card" data-sidx="${sIdx}">
+      <div class="seccion-head" onclick="toggleSeccion(${sIdx}, event)">
+        <div class="seccion-num">${sIdx+1}</div>
+        <div class="seccion-info">
+          <div class="seccion-tit">${escapeHtml(sec.titulo || 'Sin título')}</div>
+          <div class="seccion-meta">${cantLec} ${cantLec === 1 ? 'lección' : 'lecciones'}</div>
+        </div>
+        <div class="seccion-actions" onclick="event.stopPropagation();">
+          <button class="btn-icon" onclick="moverSeccion(${sIdx},-1)" title="Subir">▲</button>
+          <button class="btn-icon" onclick="moverSeccion(${sIdx},1)" title="Bajar">▼</button>
+          <button class="btn-icon danger" onclick="eliminarSeccion(${sIdx})" title="Eliminar">🗑️</button>
+        </div>
+      </div>
+      <div class="seccion-body">
+        <div class="seccion-body-grid">
+          <div class="campo">
+            <label>Título de la sección</label>
+            <input type="text" value="${escapeAttr(sec.titulo||'')}" oninput="setSeccion(${sIdx},'titulo',this.value)" placeholder="Ej: Conceptos Básicos">
+          </div>
+          <div class="campo">
+            <label>Descripción breve (opcional)</label>
+            <input type="text" value="${escapeAttr(sec.descripcion||'')}" oninput="setSeccion(${sIdx},'descripcion',this.value)" placeholder="Aparece debajo del título">
+          </div>
+        </div>
+
+        <div class="lecciones-titulo">📄 Lecciones</div>
+        <div class="lecciones-lista">
+          ${(sec.lecciones || []).map((lec, lIdx) => renderLeccion(lec, sIdx, lIdx)).join('')}
+        </div>
+        <button class="btn-add btn-add-tiny" onclick="agregarLeccion(${sIdx})">➕ Agregar lección</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderLeccion(lec, sIdx, lIdx){
+  const cantBlk = (lec.bloques || []).length;
+  return `
+    <div class="leccion-card" data-sidx="${sIdx}" data-lidx="${lIdx}">
+      <div class="leccion-head" onclick="toggleLeccion(${sIdx},${lIdx}, event)">
+        <div class="leccion-num">${lIdx+1}</div>
+        <div class="leccion-info">
+          <div class="leccion-tit">${escapeHtml(lec.titulo || 'Sin título')}</div>
+          <div class="leccion-meta">${cantBlk} ${cantBlk === 1 ? 'bloque' : 'bloques'}</div>
+        </div>
+        <div class="seccion-actions" onclick="event.stopPropagation();">
+          <button class="btn-icon" onclick="moverLeccion(${sIdx},${lIdx},-1)" title="Subir">▲</button>
+          <button class="btn-icon" onclick="moverLeccion(${sIdx},${lIdx},1)" title="Bajar">▼</button>
+          <button class="btn-icon danger" onclick="eliminarLeccion(${sIdx},${lIdx})" title="Eliminar">🗑️</button>
+        </div>
+      </div>
+      <div class="leccion-body">
+        <div class="seccion-body-grid">
+          <div class="campo">
+            <label>Título de la lección</label>
+            <input type="text" value="${escapeAttr(lec.titulo||'')}" oninput="setLeccion(${sIdx},${lIdx},'titulo',this.value)" placeholder="Ej: ¿Qué es un Mapa de Bits?">
+          </div>
+          <div class="campo">
+            <label>Descripción breve (opcional)</label>
+            <input type="text" value="${escapeAttr(lec.descripcion||'')}" oninput="setLeccion(${sIdx},${lIdx},'descripcion',this.value)" placeholder="Aparece debajo del título">
+          </div>
+        </div>
+
+        <div class="bloques-titulo">📦 Bloques de contenido</div>
+        ${(lec.bloques || []).map((b, bIdx) => renderBloque(b, sIdx, lIdx, bIdx)).join('') || '<div style="font-size:.78rem;color:var(--gris3);padding:8px;">Sin bloques aún.</div>'}
+        <button class="btn-add btn-add-tiny" onclick="abrirModalBloque(${sIdx},${lIdx})">➕ Agregar bloque (video / texto / imagen)</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderBloque(b, sIdx, lIdx, bIdx){
+  let body = '';
+  if (b.tipo === 'video'){
+    body = `
+      <div class="campo">
+        <label>URL completa de YouTube o ID del video</label>
+        <input type="text" value="${escapeAttr(b.videoId||'')}" oninput="setBloque(${sIdx},${lIdx},${bIdx},'videoId',extraerYTId(this.value))" placeholder="https://youtube.com/watch?v=... o DX1MJxKyu9E">
+        <div class="help">Pega la URL completa de YouTube; el ID se extrae automáticamente. También puedes pegar solo el ID si lo tienes.</div>
+      </div>
+    `;
+  } else if (b.tipo === 'texto'){
+    body = `
+      <div class="campo">
+        <label>Contenido del texto</label>
+        <textarea oninput="setBloque(${sIdx},${lIdx},${bIdx},'contenido',this.value)" placeholder="Escribe el contenido aquí..." rows="4">${escapeHtml(b.contenido||'')}</textarea>
+        <div class="help">Formato soportado: <code>## Título</code>, <code>**negrita**</code>, <code>*cursiva*</code>, <code>[link](url)</code>. Dos saltos de línea = nuevo párrafo.</div>
+      </div>
+    `;
+  } else if (b.tipo === 'imagen'){
+    body = `
+      <div class="campo">
+        <label>URL de la imagen</label>
+        <input type="text" value="${escapeAttr(b.url||'')}" oninput="setBloque(${sIdx},${lIdx},${bIdx},'url',this.value)" placeholder="https://...">
+        <div class="help">Sube la imagen a tu carpeta del repo en GitHub y pega aquí la URL pública.</div>
+      </div>
+      <div class="campo">
+        <label>Pie de imagen (opcional)</label>
+        <input type="text" value="${escapeAttr(b.pie||'')}" oninput="setBloque(${sIdx},${lIdx},${bIdx},'pie',this.value)" placeholder="Aparece debajo de la imagen">
+      </div>
+    `;
+  }
+  return `
+    <div class="bloque-card">
+      <div class="bloque-head">
+        <span class="bloque-tipo-label ${b.tipo}">${b.tipo}</span>
+        <div class="bloque-actions">
+          <button class="btn-icon" onclick="moverBloque(${sIdx},${lIdx},${bIdx},-1)" title="Subir">▲</button>
+          <button class="btn-icon" onclick="moverBloque(${sIdx},${lIdx},${bIdx},1)" title="Bajar">▼</button>
+          <button class="btn-icon danger" onclick="eliminarBloque(${sIdx},${lIdx},${bIdx})" title="Eliminar">🗑️</button>
+        </div>
+      </div>
+      <div class="bloque-body">${body}</div>
+    </div>
+  `;
+}
+
+// ─── Toggle expandir ───
+function toggleSeccion(sIdx, ev){
+  if (ev.target.closest('button')) return;
+  const card = document.querySelector(`.seccion-card[data-sidx="${sIdx}"]`);
+  card.classList.toggle('expandida');
+}
+function toggleLeccion(sIdx, lIdx, ev){
+  if (ev.target.closest('button')) return;
+  const card = document.querySelector(`.leccion-card[data-sidx="${sIdx}"][data-lidx="${lIdx}"]`);
+  card.classList.toggle('expandida');
+}
+
+// ─── CRUD Secciones ───
+function agregarSeccion(){
+  estado.secciones.push({ titulo: 'Nueva sección', descripcion: '', lecciones: [] });
+  cambiosPendientes();
+  renderApp();
+  // Expandir la recién creada
+  setTimeout(() => {
+    const last = document.querySelectorAll('.seccion-card');
+    if (last.length) last[last.length-1].classList.add('expandida');
+  }, 50);
+}
+
+function setSeccion(sIdx, campo, valor){
+  estado.secciones[sIdx][campo] = valor;
+  cambiosPendientes();
+  const card = document.querySelector(`.seccion-card[data-sidx="${sIdx}"]`);
+  if (card){
+    const tit = card.querySelector('.seccion-tit');
+    if (tit && campo === 'titulo') tit.textContent = valor || 'Sin título';
+  }
+}
+
+function moverSeccion(sIdx, dir){
+  const nuevoIdx = sIdx + dir;
+  if (nuevoIdx < 0 || nuevoIdx >= estado.secciones.length) return;
+  [estado.secciones[sIdx], estado.secciones[nuevoIdx]] = [estado.secciones[nuevoIdx], estado.secciones[sIdx]];
+  cambiosPendientes();
+  renderApp();
+}
+
+function eliminarSeccion(sIdx){
+  const sec = estado.secciones[sIdx];
+  confirmar(`Eliminar "${sec.titulo || 'sección'}"?`, `Se borrarán las ${(sec.lecciones||[]).length} lecciones que tiene dentro. Esta acción no se puede deshacer.`, () => {
+    estado.secciones.splice(sIdx, 1);
+    cambiosPendientes();
+    renderApp();
+  });
+}
+
+// ─── CRUD Lecciones ───
+function agregarLeccion(sIdx){
+  if (!estado.secciones[sIdx].lecciones) estado.secciones[sIdx].lecciones = [];
+  estado.secciones[sIdx].lecciones.push({ titulo: 'Nueva lección', descripcion: '', bloques: [] });
+  cambiosPendientes();
+  renderApp();
+  setTimeout(() => {
+    const card = document.querySelector(`.seccion-card[data-sidx="${sIdx}"]`);
+    if (card) card.classList.add('expandida');
+    const lecs = document.querySelectorAll(`.seccion-card[data-sidx="${sIdx}"] .leccion-card`);
+    if (lecs.length) lecs[lecs.length-1].classList.add('expandida');
+  }, 50);
+}
+
+function setLeccion(sIdx, lIdx, campo, valor){
+  estado.secciones[sIdx].lecciones[lIdx][campo] = valor;
+  cambiosPendientes();
+  const card = document.querySelector(`.leccion-card[data-sidx="${sIdx}"][data-lidx="${lIdx}"]`);
+  if (card){
+    const tit = card.querySelector('.leccion-tit');
+    if (tit && campo === 'titulo') tit.textContent = valor || 'Sin título';
+  }
+}
+
+function moverLeccion(sIdx, lIdx, dir){
+  const lecs = estado.secciones[sIdx].lecciones;
+  const nuevoIdx = lIdx + dir;
+  if (nuevoIdx < 0 || nuevoIdx >= lecs.length) return;
+  [lecs[lIdx], lecs[nuevoIdx]] = [lecs[nuevoIdx], lecs[lIdx]];
+  cambiosPendientes();
+  renderApp();
+  setTimeout(() => {
+    document.querySelector(`.seccion-card[data-sidx="${sIdx}"]`)?.classList.add('expandida');
+  }, 50);
+}
+
+function eliminarLeccion(sIdx, lIdx){
+  const lec = estado.secciones[sIdx].lecciones[lIdx];
+  confirmar(`Eliminar "${lec.titulo || 'lección'}"?`, `Se borrarán los ${(lec.bloques||[]).length} bloques que tiene. Esta acción no se puede deshacer.`, () => {
+    estado.secciones[sIdx].lecciones.splice(lIdx, 1);
+    cambiosPendientes();
+    renderApp();
+    setTimeout(() => {
+      document.querySelector(`.seccion-card[data-sidx="${sIdx}"]`)?.classList.add('expandida');
+    }, 50);
+  });
+}
+
+// ─── CRUD Bloques ───
+function abrirModalBloque(sIdx, lIdx){
+  bloqueDestino = { sIdx, lIdx };
+  bloqueTipoSeleccionado = null;
+  document.querySelectorAll('.tipo-opcion').forEach(el => el.classList.remove('sel'));
+  document.getElementById('modalBloque').classList.add('visible');
+}
+
+function seleccionarTipo(tipo){
+  bloqueTipoSeleccionado = tipo;
+  document.querySelectorAll('.tipo-opcion').forEach(el => el.classList.remove('sel'));
+  document.querySelector(`.tipo-opcion[data-tipo="${tipo}"]`).classList.add('sel');
+}
+
+function confirmarTipoBloque(){
+  if (!bloqueTipoSeleccionado){ toast('Elige un tipo de bloque', 'err'); return; }
+  const { sIdx, lIdx } = bloqueDestino;
+  const lec = estado.secciones[sIdx].lecciones[lIdx];
+  if (!lec.bloques) lec.bloques = [];
+  const nuevo = { tipo: bloqueTipoSeleccionado };
+  if (bloqueTipoSeleccionado === 'video') nuevo.videoId = '';
+  if (bloqueTipoSeleccionado === 'texto') nuevo.contenido = '';
+  if (bloqueTipoSeleccionado === 'imagen') { nuevo.url = ''; nuevo.pie = ''; }
+  lec.bloques.push(nuevo);
+  cambiosPendientes();
+  cerrarModal('modalBloque');
+  renderApp();
+  setTimeout(() => {
+    document.querySelector(`.seccion-card[data-sidx="${sIdx}"]`)?.classList.add('expandida');
+    document.querySelector(`.leccion-card[data-sidx="${sIdx}"][data-lidx="${lIdx}"]`)?.classList.add('expandida');
+  }, 50);
+}
+
+function setBloque(sIdx, lIdx, bIdx, campo, valor){
+  estado.secciones[sIdx].lecciones[lIdx].bloques[bIdx][campo] = valor;
+  cambiosPendientes();
+}
+
+function moverBloque(sIdx, lIdx, bIdx, dir){
+  const blks = estado.secciones[sIdx].lecciones[lIdx].bloques;
+  const nuevoIdx = bIdx + dir;
+  if (nuevoIdx < 0 || nuevoIdx >= blks.length) return;
+  [blks[bIdx], blks[nuevoIdx]] = [blks[nuevoIdx], blks[bIdx]];
+  cambiosPendientes();
+  renderApp();
+  setTimeout(() => {
+    document.querySelector(`.seccion-card[data-sidx="${sIdx}"]`)?.classList.add('expandida');
+    document.querySelector(`.leccion-card[data-sidx="${sIdx}"][data-lidx="${lIdx}"]`)?.classList.add('expandida');
+  }, 50);
+}
+
+function eliminarBloque(sIdx, lIdx, bIdx){
+  const blk = estado.secciones[sIdx].lecciones[lIdx].bloques[bIdx];
+  confirmar(`Eliminar bloque de tipo "${blk.tipo}"?`, 'Esta acción no se puede deshacer.', () => {
+    estado.secciones[sIdx].lecciones[lIdx].bloques.splice(bIdx, 1);
+    cambiosPendientes();
+    renderApp();
+    setTimeout(() => {
+      document.querySelector(`.seccion-card[data-sidx="${sIdx}"]`)?.classList.add('expandida');
+      document.querySelector(`.leccion-card[data-sidx="${sIdx}"][data-lidx="${lIdx}"]`)?.classList.add('expandida');
+    }, 50);
+  });
+}
+
+// ─── Modales ───
+function confirmar(titulo, msg, callback){
+  document.getElementById('confirmTitulo').textContent = titulo;
+  document.getElementById('confirmMsg').textContent = msg;
+  const btn = document.getElementById('confirmBtn');
+  btn.onclick = () => { callback(); cerrarModal('modalConfirm'); };
+  document.getElementById('modalConfirm').classList.add('visible');
+}
+
+function cerrarModal(id){
+  document.getElementById(id).classList.remove('visible');
+}
+
+// ─── Guardar ───
+async function guardarCambios(){
+  const btn = document.getElementById('btnGuardar');
+  btn.disabled = true;
+  btn.textContent = 'Guardando...';
+  try {
+    // Validar
+    for (const sec of estado.secciones){
+      if (!sec.titulo || !sec.titulo.trim()){
+        toast('Hay una sección sin título. Revisa antes de guardar.', 'err');
+        btn.disabled = false;
+        btn.textContent = '💾 Guardar cambios';
+        return;
+      }
+      for (const lec of (sec.lecciones || [])){
+        if (!lec.titulo || !lec.titulo.trim()){
+          toast(`Hay una lección sin título en "${sec.titulo}". Revisa antes de guardar.`, 'err');
+          btn.disabled = false;
+          btn.textContent = '💾 Guardar cambios';
+          return;
+        }
+      }
+    }
+    await db.collection('configuracion').doc('mentoria').set({
+      secciones: estado.secciones,
+      version: 2,
+      actualizadoEn: firebase.firestore.FieldValue.serverTimestamp(),
+      actualizadoPor: usuario.email
+    });
+    estadoCambiado = false;
+    actualizarEstadoGuardado('✓ Guardado');
+    toast('Cambios publicados. Los usuarios ya ven la nueva versión.', 'ok');
+  } catch (e) {
+    toast('Error guardando: ' + e.message, 'err');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '💾 Guardar cambios';
+  }
+}
+
+function cambiosPendientes(){
+  estadoCambiado = true;
+  actualizarEstadoGuardado('⚠️ Cambios sin guardar');
+}
+
+function actualizarEstadoGuardado(txt){
+  const el = document.getElementById('estadoGuardado');
+  el.textContent = txt;
+  el.style.color = txt.startsWith('⚠️') ? 'var(--warn)' : (txt.startsWith('✓') ? 'var(--ok)' : 'var(--gris2)');
+}
+
+// ─── Aviso antes de salir con cambios ───
+window.addEventListener('beforeunload', e => {
+  if (estadoCambiado){
+    e.preventDefault();
+    e.returnValue = '';
+  }
+});
+
+// ─── Helpers ───
+function escapeHtml(s){
+  if (s === null || s === undefined) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function escapeAttr(s){
+  if (s === null || s === undefined) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+}
+
+// Extrae el video ID de una URL de YouTube en sus distintos formatos
+function extraerYTId(input){
+  if (!input) return '';
+  const s = input.trim();
+  // Si ya parece un ID directo (11 caracteres alfanuméricos)
+  if (/^[a-zA-Z0-9_-]{11}$/.test(s)) return s;
+  // Patrones comunes
+  const patrones = [
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/v\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/,
+  ];
+  for (const p of patrones){
+    const m = s.match(p);
+    if (m) return m[1];
+  }
+  return s;
+}
+
+function toast(msg, tipo='ok'){
+  const t = document.getElementById('toast');
+  t.className = 'toast ' + tipo + ' visible';
+  t.textContent = msg;
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(() => t.classList.remove('visible'), 3500);
+}
+</script>
+
+</body>
+</html>

@@ -9,7 +9,7 @@
 :root{
   --negro:#000000; --blanco:#FAFAFA;
   --acento:#FF4D00; --acento2:#FFB800;
-  --gris3:#888; --gris4:#1a1a1a; --gris5:#0D0D0D;
+  --gris1:#CCCCCC; --gris2:#999999; --gris3:#666666; --gris4:#1a1a1a; --gris5:#0D0D0D;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;}
@@ -21,71 +21,304 @@ body{
   overflow-x:hidden;
 }
 
-/* MENTORIA */
-.mentoria-wrap{max-width:860px;margin:0 auto;padding:24px 20px;}
-.form-tabs{display:flex;gap:4px;margin-bottom:0;border-bottom:1px solid rgba(255,255,255,0.08);flex-wrap:wrap;}
-.ftab{background:transparent;border:none;color:var(--gris3);font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:600;padding:10px 14px;cursor:pointer;border-bottom:2px solid transparent;transition:.2s;}
-.ftab:hover{color:var(--blanco);}
-.ftab.activo{color:var(--acento);border-bottom-color:var(--acento);}
-.form-contenido{background:var(--gris5);border:1px solid rgba(255,255,255,0.06);border-top:none;border-radius:0 0 12px 12px;padding:24px;}
-.form-item{display:none;}
-.form-item.activo{display:block;}
-.form-item h3{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:1px;margin-bottom:4px;}
-.form-item p{color:var(--gris3);font-size:.82rem;line-height:1.6;margin-bottom:12px;}
+/* LOADER */
+.loader{position:fixed;inset:0;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;}
+.spinner{width:42px;height:42px;border:3px solid rgba(255,77,0,0.2);border-top-color:var(--acento);border-radius:50%;animation:spin .8s linear infinite;}
+.loader-text{color:var(--gris2);font-size:.85rem;margin-top:16px;letter-spacing:.5px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* LAYOUT */
+.app{display:flex;min-height:100vh;}
+
+/* SIDEBAR */
+.sidebar{
+  width:300px;background:var(--gris5);border-right:1px solid rgba(255,255,255,0.06);
+  overflow-y:auto;flex-shrink:0;padding:20px 0;
+}
+.sidebar-header{padding:0 20px 16px;border-bottom:1px solid rgba(255,255,255,0.06);margin-bottom:12px;}
+.sidebar-titulo{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:1.5px;color:var(--acento);}
+.sidebar-sub{font-size:.72rem;color:var(--gris2);margin-top:2px;letter-spacing:.5px;text-transform:uppercase;}
+
+.seccion{margin-bottom:8px;}
+.seccion-header{
+  padding:12px 20px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;
+  user-select:none;transition:.15s;
+}
+.seccion-header:hover{background:rgba(255,77,0,0.04);}
+.seccion-titulo{font-weight:600;font-size:.85rem;color:var(--blanco);line-height:1.3;}
+.seccion-meta{font-size:.7rem;color:var(--gris2);margin-top:2px;}
+.seccion-flecha{color:var(--gris2);font-size:.7rem;transition:.2s;flex-shrink:0;margin-left:8px;}
+.seccion.cerrada .seccion-flecha{transform:rotate(-90deg);}
+.seccion-lecciones{padding-bottom:8px;}
+.seccion.cerrada .seccion-lecciones{display:none;}
+
+.leccion{
+  padding:10px 20px 10px 36px;cursor:pointer;display:block;font-size:.8rem;color:var(--gris1);
+  border-left:3px solid transparent;transition:.15s;line-height:1.4;
+}
+.leccion:hover{background:rgba(255,255,255,0.02);color:var(--blanco);}
+.leccion.activa{background:rgba(255,77,0,0.08);border-left-color:var(--acento);color:var(--blanco);}
+.leccion-icono{display:inline-block;width:14px;color:var(--gris3);margin-right:6px;font-size:.7rem;}
+.leccion.activa .leccion-icono{color:var(--acento);}
+
+/* TOGGLE SIDEBAR MOBILE */
+.btn-sidebar{
+  display:none;position:fixed;top:12px;left:12px;z-index:100;
+  background:var(--acento);color:#fff;border:none;width:40px;height:40px;
+  border-radius:8px;cursor:pointer;font-size:1.1rem;box-shadow:0 4px 12px rgba(0,0,0,0.5);
+}
+
+/* CONTENIDO */
+.contenido{flex:1;overflow-y:auto;padding:32px 40px;min-width:0;}
+.contenido-header{margin-bottom:24px;}
+.contenido-breadcrumb{font-size:.72rem;color:var(--gris2);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+.contenido-titulo{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:1px;line-height:1.1;margin-bottom:6px;}
+.contenido-desc{color:var(--gris2);font-size:.88rem;line-height:1.5;}
+
+/* BLOQUES */
+.bloques{display:flex;flex-direction:column;gap:20px;max-width:900px;}
+.bloque-video{position:relative;padding-bottom:56.25%;border-radius:10px;overflow:hidden;border:1px solid rgba(255,77,0,0.2);background:#000;}
+.bloque-video iframe{position:absolute;inset:0;width:100%;height:100%;border:none;}
+.bloque-texto{background:var(--gris5);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:20px 22px;font-size:.92rem;line-height:1.65;color:var(--gris1);}
+.bloque-texto h1,.bloque-texto h2,.bloque-texto h3{color:var(--blanco);margin:8px 0 8px;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;}
+.bloque-texto h1{font-size:1.5rem;}
+.bloque-texto h2{font-size:1.25rem;}
+.bloque-texto h3{font-size:1.05rem;}
+.bloque-texto p{margin-bottom:8px;}
+.bloque-texto strong{color:var(--blanco);}
+.bloque-texto em{color:var(--acento2);font-style:normal;}
+.bloque-texto a{color:var(--acento);text-decoration:underline;}
+.bloque-texto ul,.bloque-texto ol{margin:6px 0 10px 22px;}
+.bloque-texto li{margin-bottom:4px;}
+.bloque-imagen{border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,0.06);background:var(--gris5);text-align:center;}
+.bloque-imagen img{max-width:100%;height:auto;display:block;margin:0 auto;}
+.bloque-imagen-pie{padding:10px 16px;font-size:.78rem;color:var(--gris2);font-style:italic;border-top:1px solid rgba(255,255,255,0.04);}
+
+/* VACÍO */
+.vacio{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;text-align:center;color:var(--gris2);padding:20px;}
+.vacio-ico{font-size:3rem;margin-bottom:14px;opacity:.4;}
+.vacio-titulo{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:1px;color:var(--blanco);margin-bottom:6px;}
+.vacio-sub{font-size:.9rem;line-height:1.5;max-width:400px;}
 
 /* RESPONSIVE */
+@media(max-width:768px){
+  .btn-sidebar{display:flex;align-items:center;justify-content:center;}
+  .sidebar{
+    position:fixed;top:0;left:-300px;height:100vh;width:280px;z-index:99;
+    transition:left .25s;box-shadow:8px 0 32px rgba(0,0,0,0.6);
+  }
+  .sidebar.open{left:0;}
+  .contenido{padding:60px 18px 32px;}
+  .contenido-titulo{font-size:1.5rem;}
+  .sidebar-titulo{font-size:1.1rem;}
+  .overlay-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:98;}
+  .overlay-bg.visible{display:block;}
+}
 @media(max-width:480px){
-  .form-tabs{gap:0;}
-  .ftab{font-size:.72rem;padding:10px 10px;}
-  .form-contenido{padding:18px 14px;}
-  .form-item h3{font-size:1.1rem;}
-  .mentoria-wrap{padding:16px 12px;}
+  .contenido{padding:60px 14px 24px;}
+  .contenido-titulo{font-size:1.3rem;}
+  .bloque-texto{padding:16px;font-size:.85rem;}
 }
   </style>
 </head>
 <body>
 
-  <div class="mentoria-wrap">
-    <div class="form-tabs">
-      <button class="ftab activo" onclick="cambiarTab('bits',this)">¿Qué es un Mapa de Bits?</button>
-      <button class="ftab" onclick="cambiarTab('vector',this)">¿Qué es un Vector?</button>
-      <button class="ftab" onclick="cambiarTab('sublimacion',this)">Organizar para Sublimación</button>
-      <button class="ftab" onclick="cambiarTab('dtf',this)">Organizar para DTF</button>
+<div class="loader" id="loader">
+  <div class="spinner"></div>
+  <div class="loader-text">Cargando mentoría...</div>
+</div>
+
+<button class="btn-sidebar" id="btnSidebar" onclick="toggleSidebar()">☰</button>
+<div class="overlay-bg" id="overlayBg" onclick="toggleSidebar()"></div>
+
+<div class="app" id="app" style="display:none;">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-titulo">📚 Mentoría</div>
+      <div class="sidebar-sub">MegaPack VIP</div>
     </div>
-    <div class="form-contenido">
-      <div class="form-item activo" id="tab-bits">
-        <h3>¿Qué es un Mapa de Bits?</h3>
-        <div style="position:relative;padding-bottom:56.25%;border-radius:10px;overflow:hidden;border:1px solid rgba(255,77,0,0.2);margin-top:12px;">
-          <iframe src="https://www.youtube.com/embed/DX1MJxKyu9E" title="Mapa de Bits" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:none;"></iframe>
-        </div>
-      </div>
-      <div class="form-item" id="tab-vector">
-        <h3>¿Qué es un Gráfico Vectorial?</h3>
-        <div style="position:relative;padding-bottom:56.25%;border-radius:10px;overflow:hidden;border:1px solid rgba(255,77,0,0.2);margin-top:12px;">
-          <iframe src="https://www.youtube.com/embed/ArXG5AUT8Bg" title="Vector" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:none;"></iframe>
-        </div>
-      </div>
-      <div class="form-item" id="tab-sublimacion">
-        <h3>Organizar para Sublimación con Photoshop</h3>
-        <div style="position:relative;padding-bottom:56.25%;border-radius:10px;overflow:hidden;border:1px solid rgba(255,77,0,0.2);margin-top:12px;">
-          <iframe src="https://www.youtube.com/embed/ldrusqciNrc" title="Sublimación" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:none;"></iframe>
-        </div>
-      </div>
-      <div class="form-item" id="tab-dtf">
-        <h3>Organizar para DTF con Photoshop</h3>
-        <div style="position:relative;padding-bottom:56.25%;border-radius:10px;overflow:hidden;border:1px solid rgba(255,77,0,0.2);margin-top:12px;">
-          <iframe src="https://www.youtube.com/embed/v0cTBwvQBYk" title="DTF" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:none;"></iframe>
-        </div>
-      </div>
-    </div>
-  </div>
+    <div id="navSecciones"></div>
+  </aside>
+
+  <main class="contenido" id="contenido"></main>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
 <script>
-function cambiarTab(tab, btn){
-  document.querySelectorAll('.form-item').forEach(f => f.classList.remove('activo'));
-  document.querySelectorAll('.ftab').forEach(b => b.classList.remove('activo'));
-  document.getElementById('tab-'+tab).classList.add('activo');
-  btn.classList.add('activo');
+// ─── FRAME-BUSTING: si no estoy dentro de un iframe, redirige al portal ───
+if (window.self === window.top) {
+  window.location.replace('acceso_optimizador.html');
+}
+
+// ─── Firebase ───
+const FB = {
+  apiKey:"AIzaSyA-59q3N-iQdtUEO5SXESZZ3DCcK1WCl-k",
+  authDomain:"optimizador-pro-dtf.firebaseapp.com",
+  projectId:"optimizador-pro-dtf",
+  storageBucket:"optimizador-pro-dtf.firebasestorage.app",
+  messagingSenderId:"497164758708",
+  appId:"1:497164758708:web:1adbd3ebb9a2f441abb1e1"
+};
+firebase.initializeApp(FB);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+let secciones = [];
+let seccionActivaIdx = 0;
+let leccionActivaIdx = 0;
+
+auth.onAuthStateChanged(async user => {
+  if (!user) {
+    try { window.parent.location.replace('acceso_optimizador.html'); }
+    catch(e){ window.location.replace('acceso_optimizador.html'); }
+    return;
+  }
+  try {
+    const snap = await db.collection('configuracion').doc('mentoria').get();
+    if (!snap.exists) {
+      mostrarVacio('La configuración aún no se ha creado. El admin debe entrar al panel para configurarla.');
+      return;
+    }
+    const data = snap.data();
+    secciones = data.secciones || [];
+    if (secciones.length === 0) {
+      mostrarVacio('Aún no hay contenido. El admin debe agregar secciones desde el panel.');
+      return;
+    }
+    renderSidebar();
+    renderLeccion(0, 0);
+    document.getElementById('loader').style.display = 'none';
+    document.getElementById('app').style.display = 'flex';
+  } catch (err) {
+    console.error(err);
+    mostrarVacio('Error cargando contenido. Recarga la página o contacta al administrador.');
+  }
+});
+
+function renderSidebar(){
+  const nav = document.getElementById('navSecciones');
+  nav.innerHTML = '';
+  secciones.forEach((sec, sIdx) => {
+    const cantLec = (sec.lecciones || []).length;
+    const div = document.createElement('div');
+    div.className = 'seccion';
+    div.dataset.idx = sIdx;
+    div.innerHTML = `
+      <div class="seccion-header" onclick="toggleSeccion(${sIdx})">
+        <div>
+          <div class="seccion-titulo">${escapeHtml(sec.titulo || 'Sin título')}</div>
+          <div class="seccion-meta">${cantLec} ${cantLec === 1 ? 'lección' : 'lecciones'}</div>
+        </div>
+        <div class="seccion-flecha">▼</div>
+      </div>
+      <div class="seccion-lecciones">
+        ${(sec.lecciones || []).map((lec, lIdx) => `
+          <a class="leccion ${sIdx===seccionActivaIdx && lIdx===leccionActivaIdx ? 'activa' : ''}"
+             onclick="renderLeccion(${sIdx}, ${lIdx})">
+            <span class="leccion-icono">▶</span>${escapeHtml(lec.titulo || 'Sin título')}
+          </a>
+        `).join('')}
+      </div>
+    `;
+    nav.appendChild(div);
+  });
+}
+
+function toggleSeccion(idx){
+  const el = document.querySelector(`.seccion[data-idx="${idx}"]`);
+  el.classList.toggle('cerrada');
+}
+
+function renderLeccion(sIdx, lIdx){
+  seccionActivaIdx = sIdx;
+  leccionActivaIdx = lIdx;
+  const sec = secciones[sIdx];
+  const lec = sec.lecciones[lIdx];
+  if (!lec) return;
+
+  document.querySelectorAll('.leccion').forEach(el => el.classList.remove('activa'));
+  const navLecs = document.querySelectorAll(`.seccion[data-idx="${sIdx}"] .leccion`);
+  if (navLecs[lIdx]) navLecs[lIdx].classList.add('activa');
+
+  let html = `
+    <div class="contenido-header">
+      <div class="contenido-breadcrumb">${escapeHtml(sec.titulo || '')}</div>
+      <div class="contenido-titulo">${escapeHtml(lec.titulo || 'Sin título')}</div>
+      ${lec.descripcion ? `<div class="contenido-desc">${escapeHtml(lec.descripcion)}</div>` : ''}
+    </div>
+    <div class="bloques">
+  `;
+  (lec.bloques || []).forEach(b => { html += renderBloque(b); });
+  if ((lec.bloques || []).length === 0) {
+    html += `<div class="vacio" style="min-height:200px;"><div class="vacio-sub">Esta lección aún no tiene contenido.</div></div>`;
+  }
+  html += '</div>';
+  document.getElementById('contenido').innerHTML = html;
+  document.getElementById('contenido').scrollTop = 0;
+
+  if (window.innerWidth <= 768) {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('overlayBg').classList.remove('visible');
+  }
+}
+
+function renderBloque(b){
+  if (b.tipo === 'video' && b.videoId) {
+    return `<div class="bloque-video">
+      <iframe src="https://www.youtube.com/embed/${escapeHtml(b.videoId)}"
+              title="Video" frameborder="0"
+              allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture"
+              allowfullscreen></iframe>
+    </div>`;
+  }
+  if (b.tipo === 'texto' && b.contenido) {
+    return `<div class="bloque-texto">${markdownSimple(b.contenido)}</div>`;
+  }
+  if (b.tipo === 'imagen' && b.url) {
+    const pie = b.pie ? `<div class="bloque-imagen-pie">${escapeHtml(b.pie)}</div>` : '';
+    return `<div class="bloque-imagen"><img src="${escapeHtml(b.url)}" alt="${escapeHtml(b.pie||'')}" loading="lazy">${pie}</div>`;
+  }
+  return '';
+}
+
+function escapeHtml(s){
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function markdownSimple(text){
+  let t = escapeHtml(text);
+  t = t.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+  t = t.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+  t = t.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+  t = t.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  t = t.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  t = t.replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+  const parrafos = t.split(/\n\n+/).map(p => {
+    if (p.match(/^<h[1-3]>/)) return p;
+    return '<p>' + p.replace(/\n/g, '<br>') + '</p>';
+  });
+  return parrafos.join('');
+}
+
+function mostrarVacio(msg){
+  document.getElementById('loader').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  document.getElementById('navSecciones').innerHTML = '';
+  document.getElementById('contenido').innerHTML = `
+    <div class="vacio">
+      <div class="vacio-ico">📭</div>
+      <div class="vacio-titulo">Sin contenido</div>
+      <div class="vacio-sub">${escapeHtml(msg)}</div>
+    </div>`;
+}
+
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('overlayBg').classList.toggle('visible');
 }
 </script>
 
